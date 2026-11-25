@@ -6,6 +6,36 @@
     <meta name="theme-color" content="#17181b">
     <title>Sound Charades</title>
     <link rel="stylesheet" href="../shared/estilo.css">
+    <style>
+        /* Traducción al español e italiano (solo cuando se juega en inglés) */
+        .trans {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 4px;
+            padding-top: 12px;
+            border-top: 1px solid var(--line);
+        }
+        .trans div {
+            display: flex;
+            align-items: baseline;
+            justify-content: center;
+            gap: 10px;
+            font-size: clamp(1.5rem, 7.5vw, 2.2rem);
+            font-weight: 600;
+            line-height: 1.1;
+            color: var(--pass);
+            overflow-wrap: anywhere;
+            text-wrap: balance;
+        }
+        .lang-tag {
+            flex: none;
+            font-size: .75rem;
+            font-weight: 600;
+            letter-spacing: .12em;
+            color: var(--muted);
+        }
+    </style>
 </head>
 <body>
 
@@ -97,6 +127,10 @@
         <div class="card">
             <div class="kicker" data-i18n="makeSound">Haz el sonido</div>
             <div class="word" id="wordTarget"></div>
+            <div class="trans" id="wordTrans" hidden>
+                <div><span class="lang-tag">ES</span><span id="trEs"></span></div>
+                <div><span class="lang-tag">IT</span><span id="trIt"></span></div>
+            </div>
             <div class="note" data-i18n="rule">Sin hablar y sin usar los brazos</div>
         </div>
 
@@ -294,13 +328,288 @@
             "Tarzan yell", "Chewbacca", "Darth Vader breathing", "Donald Duck", "Meditating (Ommm)", "Rocket launch"
         ];
 
+
+        // --- TRADUCCIONES (solo en inglés): [español, italiano] ---
+        const traducciones = {
+            "Dog": ["Perro", "Cane"],
+            "Cat": ["Gato", "Gatto"],
+            "Cow": ["Vaca", "Mucca"],
+            "Horse": ["Caballo", "Cavallo"],
+            "Pig": ["Cerdo", "Maiale"],
+            "Sheep": ["Oveja", "Pecora"],
+            "Rooster": ["Gallo", "Gallo"],
+            "Duck": ["Pato", "Anatra"],
+            "Frog": ["Rana", "Rana"],
+            "Bee": ["Abeja", "Ape"],
+            "Mosquito": ["Mosquito", "Zanzara"],
+            "Elephant": ["Elefante", "Elefante"],
+            "Lion": ["León", "Leone"],
+            "Monkey": ["Mono", "Scimmia"],
+            "Snake": ["Serpiente", "Serpente"],
+            "Wolf": ["Lobo", "Lupo"],
+            "Owl": ["Búho", "Gufo"],
+            "Crow": ["Cuervo", "Corvo"],
+            "Seagull": ["Gaviota", "Gabbiano"],
+            "Dolphin": ["Delfín", "Delfino"],
+            "Whale": ["Ballena", "Balena"],
+            "Cricket": ["Grillo", "Grillo"],
+            "Donkey": ["Burro", "Asino"],
+            "Turkey": ["Pavo", "Tacchino"],
+            "Mouse": ["Ratón", "Topo"],
+            "Goat": ["Cabra", "Capra"],
+            "Hen": ["Gallina", "Gallina"],
+            "Bear": ["Oso", "Orso"],
+            "Tiger": ["Tigre", "Tigre"],
+            "Parrot": ["Loro", "Pappagallo"],
+            "Seal": ["Foca", "Foca"],
+            "Woodpecker": ["Pájaro carpintero", "Picchio"],
+            "Gorilla": ["Gorila", "Gorilla"],
+            "Hyena": ["Hiena", "Iena"],
+            "Penguin": ["Pingüino", "Pinguino"],
+            "Camel": ["Camello", "Cammello"],
+            "Turtle": ["Tortuga", "Tartaruga"],
+            "Kangaroo": ["Canguro", "Canguro"],
+            "Hippo": ["Hipopótamo", "Ippopotamo"],
+            "Chick": ["Pollito", "Pulcino"],
+            "Angry goose": ["Ganso enfadado", "Oca arrabbiata"],
+            "Pigeon cooing": ["Paloma arrullando", "Piccione che tuba"],
+            "Dog drinking water": ["Perro bebiendo agua", "Cane che beve acqua"],
+            "Rain": ["Lluvia", "Pioggia"],
+            "Thunderstorm": ["Tormenta", "Temporale"],
+            "Strong wind": ["Viento fuerte", "Vento forte"],
+            "River flowing": ["Río fluyendo", "Fiume che scorre"],
+            "Ocean waves": ["Olas del mar", "Onde del mare"],
+            "Walking on dry leaves": ["Pisar hojas secas", "Camminare sulle foglie secche"],
+            "Crackling fire": ["Fuego crepitando", "Fuoco scoppiettante"],
+            "Volcano erupting": ["Erupción de un volcán", "Vulcano in eruzione"],
+            "Earthquake": ["Terremoto", "Terremoto"],
+            "Walking in deep snow": ["Andar por la nieve", "Camminare nella neve alta"],
+            "Water dripping": ["Gota de agua cayendo", "Acqua che gocciola"],
+            "Tree falling down": ["Árbol cayéndose", "Albero che cade"],
+            "Splashing in a puddle": ["Chapotear en un charco", "Saltare in una pozzanghera"],
+            "Echo in the mountains": ["Eco en la montaña", "Eco in montagna"],
+            "Chopping onions": ["Cortar cebolla", "Tagliare la cipolla"],
+            "Frying an egg": ["Freír un huevo", "Friggere un uovo"],
+            "Making popcorn": ["Hacer palomitas", "Fare i popcorn"],
+            "Blender": ["Batidora", "Frullatore"],
+            "Microwave": ["Microondas", "Microonde"],
+            "Vacuum cleaner": ["Aspiradora", "Aspirapolvere"],
+            "Flushing the toilet": ["Tirar de la cadena", "Tirare lo sciacquone"],
+            "Brushing your teeth": ["Lavarse los dientes", "Lavarsi i denti"],
+            "Taking a shower": ["Ducharse", "Fare la doccia"],
+            "Wall clock": ["Reloj de pared", "Orologio da parete"],
+            "Hairdryer": ["Secador de pelo", "Asciugacapelli"],
+            "Creaky door": ["Puerta chirriando", "Porta che cigola"],
+            "Breaking glass": ["Romper un cristal", "Vetro che si rompe"],
+            "Opening a can of soda": ["Abrir una lata de refresco", "Aprire una lattina"],
+            "Pouring water": ["Servir agua", "Versare l'acqua"],
+            "Washing machine spinning": ["Lavadora centrifugando", "Lavatrice in centrifuga"],
+            "Boiling kettle": ["Hervidor hirviendo", "Bollitore che bolle"],
+            "Sharpening a knife": ["Afilar un cuchillo", "Affilare un coltello"],
+            "Toaster popping": ["Tostadora saltando", "Tostapane che salta"],
+            "Slamming a window": ["Cerrar una ventana de golpe", "Sbattere una finestra"],
+            "Sweeping the floor": ["Barrer el suelo", "Spazzare il pavimento"],
+            "Popping a cork": ["Descorchar una botella", "Stappare una bottiglia"],
+            "Coins falling on the floor": ["Monedas cayendo al suelo", "Monete che cadono a terra"],
+            "Scissors cutting": ["Tijeras cortando", "Forbici che tagliano"],
+            "Locking a door": ["Cerrar con llave", "Chiudere a chiave"],
+            "Lighting a match": ["Encender una cerilla", "Accendere un fiammifero"],
+            "Cutting crusty bread": ["Cortar pan crujiente", "Tagliare il pane croccante"],
+            "Washing the dishes": ["Fregar los platos", "Lavare i piatti"],
+            "Whisking eggs": ["Batir huevos", "Sbattere le uova"],
+            "Turning on the tap": ["Abrir el grifo", "Aprire il rubinetto"],
+            "Ice cubes in a glass": ["Cubitos de hielo en un vaso", "Cubetti di ghiaccio nel bicchiere"],
+            "Coffee machine": ["Cafetera", "Macchina del caffè"],
+            "Pressure cooker": ["Olla exprés", "Pentola a pressione"],
+            "Sizzling barbecue": ["Barbacoa chisporroteando", "Barbecue sfrigolante"],
+            "Opening a bag of crisps": ["Abrir una bolsa de patatas", "Aprire un sacchetto di patatine"],
+            "Creaky wooden floor": ["Suelo de madera crujiendo", "Pavimento di legno che scricchiola"],
+            "Cuckoo clock": ["Reloj de cuco", "Orologio a cucù"],
+            "Bubble wrap popping": ["Explotar plástico de burbujas", "Scoppiare il pluriball"],
+            "Snoring": ["Roncar", "Russare"],
+            "Sneezing": ["Estornudar", "Starnutire"],
+            "Coughing": ["Toser", "Tossire"],
+            "Hiccups": ["Hipo", "Singhiozzo"],
+            "Crying your eyes out": ["Llorar a mares", "Piangere a dirotto"],
+            "Laughing out loud": ["Reír a carcajadas", "Ridere a crepapelle"],
+            "Yawning": ["Bostezar", "Sbadigliare"],
+            "Gargling": ["Hacer gárgaras", "Fare i gargarismi"],
+            "Eating with your mouth open": ["Comer con la boca abierta", "Mangiare a bocca aperta"],
+            "Passionate kiss": ["Beso apasionado", "Bacio appassionato"],
+            "Whistling a song": ["Silbar una canción", "Fischiettare una canzone"],
+            "Sipping a drink": ["Beber a sorbos", "Sorseggiare una bevanda"],
+            "Shivering with cold": ["Tiritar de frío", "Tremare dal freddo"],
+            "Clapping": ["Aplaudir", "Applaudire"],
+            "Blowing out candles": ["Soplar las velas", "Spegnere le candeline"],
+            "Blowing your nose": ["Sonarse la nariz", "Soffiarsi il naso"],
+            "Sighing": ["Suspirar", "Sospirare"],
+            "Crunching something": ["Masticar algo crujiente", "Sgranocchiare qualcosa"],
+            "Choking": ["Atragantarse", "Strozzarsi"],
+            "Panting": ["Jadear", "Ansimare"],
+            "Licking your fingers": ["Chuparse los dedos", "Leccarsi le dita"],
+            "Fart (with your mouth)": ["Pedo (con la boca)", "Peto (con la bocca)"],
+            "Spitting": ["Escupir", "Sputare"],
+            "Blowing on hot soup": ["Soplar sopa caliente", "Soffiare sulla minestra calda"],
+            "Chewing gum": ["Mascar chicle", "Masticare una gomma"],
+            "Heartbeat": ["Latido del corazón", "Battito del cuore"],
+            "Drinking through a straw": ["Beber con pajita", "Bere con la cannuccia"],
+            "Being tickled": ["Que te hagan cosquillas", "Farsi fare il solletico"],
+            "Sucking a sweet": ["Chupar un caramelo", "Succhiare una caramella"],
+            "Biting an apple": ["Morder una manzana", "Mordere una mela"],
+            "Burning your mouth with a hot drink": ["Quemarse con una bebida caliente", "Scottarsi con una bevanda calda"],
+            "Cracking your knuckles": ["Crujirse los dedos", "Scrocchiarsi le dita"],
+            "Smelling something disgusting": ["Oler algo asqueroso", "Sentire una puzza tremenda"],
+            "Scratching": ["Rascarse", "Grattarsi"],
+            "Burp": ["Eructo", "Rutto"],
+            "Slurping noodles": ["Sorber fideos", "Risucchiare i noodles"],
+            "Baby crying": ["Bebé llorando", "Neonato che piange"],
+            "Child having a tantrum": ["Niño con rabieta", "Bambino che fa i capricci"],
+            "Crowd booing": ["Abucheo del público", "Pubblico che fischia"],
+            "Car starting": ["Coche arrancando", "Auto che parte"],
+            "Car horn": ["Claxon", "Clacson"],
+            "Ambulance": ["Ambulancia", "Ambulanza"],
+            "Steam train": ["Tren de vapor", "Treno a vapore"],
+            "Plane taking off": ["Avión despegando", "Aereo che decolla"],
+            "Helicopter": ["Helicóptero", "Elicottero"],
+            "Motorbike": ["Moto", "Moto"],
+            "Bicycle bell": ["Timbre de bicicleta", "Campanello della bici"],
+            "Underground train braking": ["Metro frenando", "Metro che frena"],
+            "Tractor": ["Tractor", "Trattore"],
+            "Police siren": ["Sirena de policía", "Sirena della polizia"],
+            "Car braking hard": ["Frenazo de coche", "Frenata brusca"],
+            "Garbage truck": ["Camión de la basura", "Camion della spazzatura"],
+            "Car alarm": ["Alarma de coche", "Allarme dell'auto"],
+            "Pedestrian crossing beep": ["Semáforo para ciegos", "Semaforo sonoro"],
+            "Church bells": ["Campanas de iglesia", "Campane della chiesa"],
+            "High heels walking": ["Tacones al caminar", "Tacchi che camminano"],
+            "Fireworks": ["Fuegos artificiales", "Fuochi d'artificio"],
+            "Scooter": ["Patinete", "Monopattino"],
+            "Lift arriving": ["Ascensor llegando", "Ascensore che arriva"],
+            "Automatic door": ["Puerta automática", "Porta automatica"],
+            "Suitcase on wheels": ["Maleta con ruedas", "Trolley"],
+            "Ship's horn": ["Bocina de barco", "Sirena della nave"],
+            "Formula 1 car": ["Coche de Fórmula 1", "Macchina di Formula 1"],
+            "Truck reversing": ["Camión dando marcha atrás", "Camion in retromarcia"],
+            "Airport announcement": ["Megafonía del aeropuerto", "Annuncio in aeroporto"],
+            "Squeaky trainers": ["Zapatillas chirriando", "Scarpe da ginnastica che cigolano"],
+            "Flip-flops walking": ["Chanclas al andar", "Camminare con le infradito"],
+            "Typing on a keyboard": ["Teclear en el ordenador", "Scrivere sulla tastiera"],
+            "Mouse click": ["Clic del ratón", "Clic del mouse"],
+            "Typewriter": ["Máquina de escribir", "Macchina da scrivere"],
+            "Camera shutter": ["Cámara de fotos", "Scatto della fotocamera"],
+            "Phone vibrating": ["Móvil vibrando", "Telefono che vibra"],
+            "Message notification": ["Notificación de mensaje", "Notifica di un messaggio"],
+            "Printer": ["Impresora", "Stampante"],
+            "Door buzzer": ["Telefonillo", "Citofono"],
+            "Radio searching for a station": ["Radio buscando emisora", "Radio che cerca una stazione"],
+            "Game controller": ["Mando de videoconsola", "Controller della console"],
+            "Alarm clock": ["Despertador", "Sveglia"],
+            "Supermarket scanner": ["Escáner del supermercado", "Scanner del supermercato"],
+            "Old dial-up modem": ["Módem antiguo", "Vecchio modem"],
+            "Computer error sound": ["Sonido de error del ordenador", "Suono di errore del computer"],
+            "Fan spinning": ["Ventilador girando", "Ventilatore acceso"],
+            "Scratched record": ["Disco rayado", "Disco graffiato"],
+            "Old mobile ringtone": ["Tono de móvil antiguo", "Vecchia suoneria"],
+            "Cash machine": ["Cajero automático", "Bancomat"],
+            "Submarine sonar": ["Sonar de submarino", "Sonar del sottomarino"],
+            "Hammer": ["Martillo", "Martello"],
+            "Electric saw": ["Sierra eléctrica", "Sega elettrica"],
+            "Drill": ["Taladro", "Trapano"],
+            "Dentist's drill": ["Torno del dentista", "Trapano del dentista"],
+            "Electric razor": ["Maquinilla de afeitar", "Rasoio elettrico"],
+            "Cash register": ["Caja registradora", "Registratore di cassa"],
+            "Referee's whistle": ["Silbato de árbitro", "Fischietto dell'arbitro"],
+            "Morse code": ["Código Morse", "Codice Morse"],
+            "Whip": ["Látigo", "Frusta"],
+            "Sharpening a pencil": ["Sacar punta a un lápiz", "Temperare una matita"],
+            "Turning pages": ["Pasar páginas", "Sfogliare le pagine"],
+            "Zip": ["Cremallera", "Cerniera"],
+            "Ripping Velcro": ["Despegar velcro", "Strappare il velcro"],
+            "Sticky tape": ["Cinta adhesiva", "Nastro adesivo"],
+            "Opening an umbrella": ["Abrir un paraguas", "Aprire un ombrello"],
+            "Flat tyre": ["Rueda desinflándose", "Gomma a terra"],
+            "Handsaw": ["Serrucho", "Sega a mano"],
+            "Lawnmower": ["Cortacésped", "Tosaerba"],
+            "Chopping wood": ["Cortar leña", "Spaccare la legna"],
+            "Jackhammer": ["Martillo neumático", "Martello pneumatico"],
+            "Nails on a chalkboard": ["Uñas en la pizarra", "Unghie sulla lavagna"],
+            "Spray can": ["Spray", "Bomboletta spray"],
+            "Balloon deflating": ["Globo desinflándose", "Palloncino che si sgonfia"],
+            "Bubble gum popping": ["Pompa de chicle explotando", "Bolla di gomma che scoppia"],
+            "Emptying a bottle (glug glug)": ["Botella vaciándose (glu glu)", "Bottiglia che si svuota (glu glu)"],
+            "Unwrapping a present": ["Abrir un regalo", "Scartare un regalo"],
+            "Music box": ["Caja de música", "Carillon"],
+            "Tennis rally": ["Peloteo de tenis", "Scambio a tennis"],
+            "Bowling strike": ["Pleno en los bolos", "Strike a bowling"],
+            "Ping-pong": ["Ping-pong", "Ping-pong"],
+            "Bouncing a basketball": ["Botar una pelota de baloncesto", "Palleggiare a basket"],
+            "Swimming": ["Nadar", "Nuotare"],
+            "Boxing": ["Boxeo", "Pugilato"],
+            "Kicking a football": ["Chutar un balón", "Calciare un pallone"],
+            "Karate": ["Kárate", "Karate"],
+            "Arrow flying": ["Flecha volando", "Freccia che vola"],
+            "Swords clashing": ["Espadas chocando", "Spade che si scontrano"],
+            "Roller coaster": ["Montaña rusa", "Montagne russe"],
+            "Merry-go-round": ["Tiovivo", "Giostra"],
+            "Golf swing": ["Golpe de golf", "Colpo di golf"],
+            "Skipping rope": ["Saltar a la comba", "Saltare la corda"],
+            "Goal celebration": ["Celebrar un gol", "Esultanza per un gol"],
+            "Throwing a stone into water": ["Tirar una piedra al agua", "Lanciare un sasso nell'acqua"],
+            "Cannonball into the pool": ["Tirarse en bomba a la piscina", "Tuffo a bomba in piscina"],
+            "Jumping on a trampoline": ["Saltar en una cama elástica", "Saltare sul tappeto elastico"],
+            "Electric guitar": ["Guitarra eléctrica", "Chitarra elettrica"],
+            "Drums": ["Batería", "Batteria"],
+            "Trumpet": ["Trompeta", "Tromba"],
+            "Violin": ["Violín", "Violino"],
+            "Flute": ["Flauta", "Flauto"],
+            "Piano": ["Piano", "Pianoforte"],
+            "Maracas": ["Maracas", "Maracas"],
+            "Triangle": ["Triángulo", "Triangolo"],
+            "Bagpipes": ["Gaita", "Cornamusa"],
+            "Harp": ["Arpa", "Arpa"],
+            "Cymbals": ["Platillos", "Piatti"],
+            "Xylophone": ["Xilófono", "Xilofono"],
+            "Accordion": ["Acordeón", "Fisarmonica"],
+            "Beatboxing": ["Beatbox", "Beatbox"],
+            "Opera singer": ["Cantante de ópera", "Cantante lirico"],
+            "Yodelling": ["Canto tirolés", "Jodel"],
+            "Lightsaber": ["Espada láser", "Spada laser"],
+            "Laser gun (pew pew)": ["Pistola láser (piu piu)", "Pistola laser (piu piu)"],
+            "Ghost": ["Fantasma", "Fantasma"],
+            "Zombie": ["Zombi", "Zombie"],
+            "Evil witch laughing": ["Risa de bruja malvada", "Risata di strega cattiva"],
+            "T-Rex roar": ["Rugido de T-Rex", "Ruggito di T-Rex"],
+            "Alien spaceship": ["Nave extraterrestre", "Astronave aliena"],
+            "Magic spell": ["Hechizo mágico", "Incantesimo"],
+            "Monster eating": ["Monstruo comiendo", "Mostro che mangia"],
+            "Collecting a coin (Super Mario)": ["Coger una moneda (Super Mario)", "Prendere una moneta (Super Mario)"],
+            "Pac-Man eating": ["Pac-Man comiendo", "Pac-Man che mangia"],
+            "Machine gun": ["Ametralladora", "Mitragliatrice"],
+            "Huge explosion": ["Gran explosión", "Grande esplosione"],
+            "Robot walking": ["Robot caminando", "Robot che cammina"],
+            "Giant footsteps": ["Pasos de gigante", "Passi di gigante"],
+            "Tarzan yell": ["Grito de Tarzán", "Urlo di Tarzan"],
+            "Chewbacca": ["Chewbacca", "Chewbacca"],
+            "Darth Vader breathing": ["Darth Vader respirando", "Darth Vader che respira"],
+            "Donald Duck": ["Pato Donald", "Paperino"],
+            "Meditating (Ommm)": ["Meditar (Ommm)", "Meditare (Ommm)"],
+            "Rocket launch": ["Despegue de un cohete", "Lancio di un razzo"]
+        };
+
         const wordTarget = document.getElementById("wordTarget");
+        const wordTrans = document.getElementById("wordTrans");
+        const trEs = document.getElementById("trEs");
+        const trIt = document.getElementById("trIt");
 
         TurnGame({
             key: 'sound-charades',
             items: { es: dbOriginal, en: dbEnglish },
             render(palabra) {
                 wordTarget.innerText = palabra;
+                // En inglés, debajo va la traducción al español y al italiano
+                const tr = G.lang === 'en' && traducciones[palabra];
+                wordTrans.hidden = !tr;
+                if (tr) { trEs.textContent = tr[0]; trIt.textContent = tr[1]; }
             }
         });
         G.initLang();
