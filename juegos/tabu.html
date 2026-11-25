@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#17181b">
+    <title>Tabú</title>
+    <link rel="stylesheet" href="../shared/estilo.css">
+</head>
+<body>
+
+    <!-- PANTALLA 1: MENÚ -->
+    <div id="screen-menu" class="screen menu active">
+        <a class="home-link" href="../index.html">← Juegos</a>
+        <header class="menu-head">
+            <h1>Tabú</h1>
+            <p>Describe la palabra sin decir ninguna de las cuatro prohibidas.</p>
+        </header>
+        <div class="field">
+            <span class="field-label">Tiempo de ronda</span>
+            <select id="timeSelect" data-seg aria-label="Tiempo de ronda">
+                <option value="30">30 s</option>
+                <option value="60" selected>60 s</option>
+                <option value="90">90 s</option>
+                <option value="120">2 min</option>
+            </select>
+        </div>
+        <div class="field">
+            <span class="field-label">Espera para poder pasar</span>
+            <select id="cooldownSelect" data-seg aria-label="Espera para poder pasar">
+                <option value="0">No</option>
+                <option value="3">3 s</option>
+                <option value="5" selected>5 s</option>
+                <option value="10">10 s</option>
+            </select>
+        </div>
+        <div class="field">
+            <span class="field-label">Modo de juego</span>
+            <select id="modeSelect" data-seg="col" aria-label="Modo de juego">
+                <option value="solo">Un grupo</option>
+                <option value="round">Dos equipos · puntos por turno</option>
+                <option value="total">Dos equipos · marcador total</option>
+            </select>
+        </div>
+        <div id="teamsBox" class="teams" hidden>
+            <input id="teamA" maxlength="16" value="Equipo 1" aria-label="Nombre del equipo 1">
+            <input id="teamB" maxlength="16" value="Equipo 2" aria-label="Nombre del equipo 2">
+        </div>
+        <div id="roundsBox" class="field" hidden>
+            <span class="field-label">Rondas (cada equipo juega un turno por ronda)</span>
+            <select id="roundsSelect" data-seg aria-label="Rondas">
+                <option value="0">Sin límite</option>
+                <option value="3">3</option>
+                <option value="5">5</option>
+                <option value="10">10</option>
+            </select>
+        </div>
+        <div class="field">
+            <span class="field-label">Sonidos</span>
+            <select id="soundSelect" data-seg aria-label="Sonidos">
+                <option value="on">Activados</option>
+                <option value="off">Desactivados</option>
+            </select>
+        </div>
+        <button class="btn-main" id="btnStart">Empezar</button>
+        <p class="hint">Acierto +1 · Tabú −1 · Pasar 0</p>
+    </div>
+
+    <!-- PANTALLA 2: PREPARADOS -->
+    <div id="screen-ready" class="screen center">
+        <div class="panel">
+            <p class="ready-title" id="readyTitle"></p>
+            <p class="ready-sub" id="readySub"></p>
+            <div class="board" id="readyBoard"></div>
+            <button class="btn-main" id="btnGo">Empezar turno</button>
+            <button class="btn-link" data-to-menu="confirm">Volver al menú</button>
+        </div>
+    </div>
+
+    <!-- PANTALLA 3: JUEGO -->
+    <div id="screen-game" class="screen">
+        <div class="bar">
+            <button class="icon-btn" id="btnStop" aria-label="Terminar turno">✕</button>
+            <span class="clock" id="timerDisplay">60 s</span>
+            <span class="stat"><span id="scoreDisplay">0</span> pts</span>
+        </div>
+        <div class="prog"><i id="timerBar"></i></div>
+        <p class="turn-label" id="turnLabel"></p>
+
+        <div class="card">
+            <div class="kicker">Describe</div>
+            <div class="word" id="wordTarget">Palabra</div>
+            <div class="kicker forbidden-title">No digas</div>
+            <div class="forbidden-list" id="wordForbidden"></div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-fail" data-points="-1" data-flash="#3a2427">Tabú<small>−1</small></button>
+            <button class="btn btn-pass" data-points="0" data-flash="#2a2b30" data-cooldown>Pasar<small>0</small></button>
+            <button class="btn btn-success" data-points="1" data-flash="#1f3328">Acierto<small>+1</small></button>
+        </div>
+    </div>
+
+    <!-- PANTALLA 4: RESULTADO DEL TURNO -->
+    <div id="screen-result" class="screen center">
+        <div class="panel">
+            <p class="score-label">Fin del turno</p>
+            <p class="score-label" id="resultTitle"></p>
+            <p class="score-big" id="finalScore">0</p>
+            <p class="score-label">puntos</p>
+            <div class="board" id="resultBoard"></div>
+            <button class="btn-main" id="btnNext">Siguiente turno</button>
+            <button class="btn-link" id="btnEnd">Terminar partida</button>
+            <button class="btn-link" data-to-menu="confirm">Volver al menú</button>
+        </div>
+    </div>
+
+    <!-- PANTALLA 5: RESULTADO FINAL -->
+    <div id="screen-final" class="screen center">
+        <div class="panel">
+            <p class="score-label">Resultado final</p>
+            <p class="ready-title" id="finalTitle"></p>
+            <div class="board" id="finalBoard"></div>
+            <button class="btn-main" data-to-menu>Nueva partida</button>
+        </div>
+    </div>
+
+    <script src="../shared/common.js"></script>
+    <script src="../shared/turns.js"></script>
+    <script>
+        // --- BASE DE DATOS (t = palabra, f = palabras prohibidas) ---
+        const dbOriginal = [
+            // --- PALABRAS ORIGINALES ---
+            { t: "Facebook", f: ["Red Social", "Azul", "Internet", "Mark Zuckerberg"] },
+            { t: "Fútbol", f: ["Pelota", "Deporte", "Gol", "Portería"] },
+            { t: "Hospital", f: ["Médico", "Enfermo", "Curar", "Ambulancia"] },
+            { t: "Superman", f: ["Héroe", "Capa", "Volar", "Kriptonita"] },
+            { t: "Ikea", f: ["Muebles", "Suecia", "Montar", "Tienda"] },
+            { t: "Titanic", f: ["Barco", "Película", "Hundir", "Iceberg"] },
+            { t: "Café", f: ["Beber", "Desayuno", "Taza", "Cafeína"] },
+            { t: "Cervantes", f: ["Escritor", "Libro", "Quijote", "Manco"] },
+            { t: "Vampiro", f: ["Sangre", "Drácula", "Dientes", "Murciélago"] },
+            { t: "Playa", f: ["Arena", "Mar", "Verano", "Toalla"] },
+            { t: "Youtube", f: ["Video", "Internet", "Google", "Youtuber"] },
+            { t: "Harry Potter", f: ["Mago", "Varita", "Gafas", "Película"] },
+            { t: "Pizza", f: ["Italia", "Queso", "Redonda", "Masa"] },
+            { t: "Jirafa", f: ["Cuello", "Animal", "Alto", "África"] },
+            { t: "Boda", f: ["Casarse", "Novia", "Anillo", "Vestido"] },
+            { t: "Microondas", f: ["Calentar", "Cocina", "Comida", "Electrodoméstico"] },
+            { t: "Bombero", f: ["Fuego", "Apagar", "Camión", "Manguera"] },
+            { t: "Cine", f: ["Película", "Palomitas", "Pantalla", "Entrada"] },
+            { t: "Avión", f: ["Volar", "Aeropuerto", "Alas", "Viajar"] },
+            { t: "Mickey Mouse", f: ["Ratón", "Disney", "Orejas", "Pato Donald"] },
+            { t: "Navidad", f: ["Regalos", "Diciembre", "Papá Noel", "Árbol"] },
+            { t: "Espejo", f: ["Reflejo", "Mirar", "Cristal", "Cara"] },
+            { t: "Chocolate", f: ["Dulce", "Cacao", "Leche", "Negro"] },
+            { t: "Lluvia", f: ["Agua", "Nubes", "Paraguas", "Mojarse"] },
+            { t: "Payaso", f: ["Circo", "Risa", "Nariz", "Miedo"] },
+            { t: "Ducha", f: ["Baño", "Agua", "Limpiar", "Jabón"] },
+            { t: "Guitarra", f: ["Música", "Cuerdas", "Instrumento", "Tocar"] },
+            { t: "Perro", f: ["Animal", "Ladrar", "Mejor Amigo", "Hueso"] },
+            { t: "Gato", f: ["Animal", "Maullar", "Bigotes", "Siete Vidas"] },
+            { t: "Cama", f: ["Dormir", "Mueble", "Colchón", "Noche"] },
+            { t: "Sol", f: ["Estrella", "Calor", "Luz", "Día"] },
+            { t: "Luna", f: ["Noche", "Satélite", "Cielo", "Lobo"] },
+            { t: "Coche", f: ["Ruedas", "Conducir", "Vehículo", "Motor"] },
+            { t: "Bicicleta", f: ["Dos ruedas", "Pedales", "Casco", "Manillar"] },
+            { t: "Teléfono", f: ["Llamar", "Móvil", "Hablar", "Mensaje"] },
+            { t: "Reloj", f: ["Hora", "Tiempo", "Muñeca", "Agujas"] },
+            { t: "Zapatos", f: ["Pies", "Caminar", "Cordones", "Suela"] },
+            { t: "Silla", f: ["Sentarse", "Mueble", "Mesa", "Patas"] },
+            { t: "Libro", f: ["Leer", "Páginas", "Historia", "Biblioteca"] },
+            { t: "Ordenador", f: ["Teclado", "Pantalla", "Ratón", "Internet"] },
+            { t: "Escuela", f: ["Estudiar", "Profesor", "Alumnos", "Clase"] },
+            { t: "Piscina", f: ["Nadar", "Agua", "Verano", "Bañador"] },
+            { t: "Futbolín", f: ["Bar", "Muñecos", "Juego", "Girar"] },
+            { t: "Sushi", f: ["Japonés", "Arroz", "Pescado", "Crudo"] },
+            { t: "Instagram", f: ["Fotos", "Historias", "Filtros", "App"] },
+            { t: "Netflix", f: ["Series", "Películas", "Televisión", "Sofá"] },
+            { t: "Tortilla", f: ["Huevo", "Patata", "Cebolla", "Española"] },
+            { t: "Vino", f: ["Uva", "Alcohol", "Bebida", "Tinto"] },
+            { t: "Cerveza", f: ["Rubia", "Alcohol", "Bar", "Caña"] },
+            { t: "Zombie", f: ["Muerto", "Viviente", "Cerebro", "Caminar"] },
+            { t: "Fantasma", f: ["Sábana", "Espíritu", "Miedo", "Invisible"] },
+            { t: "Beso", f: ["Labios", "Amor", "Pareja", "Saludar"] },
+            { t: "Anillo", f: ["Dedo", "Joya", "Oro", "Compromiso"] },
+            { t: "Gafas", f: ["Ojos", "Ver", "Vista", "Sol"] },
+            { t: "Bigote", f: ["Pelo", "Labio", "Afeitar", "Barba"] },
+            { t: "Pirata", f: ["Barco", "Tesoro", "Parche", "Loro"] },
+            { t: "Astronauta", f: ["Espacio", "Luna", "Cohete", "Traje"] },
+            { t: "Detective", f: ["Lupa", "Investigar", "Crimen", "Policía"] },
+            { t: "TikTok", f: ["Video", "Bailar", "App", "Móvil"] },
+            { t: "WhatsApp", f: ["Mensaje", "Chat", "Escribir", "Verde"] },
+            { t: "Amazon", f: ["Comprar", "Paquete", "Internet", "Caja"] },
+            { t: "Spotify", f: ["Música", "Escuchar", "Canciones", "Playlist"] },
+            { t: "Batman", f: ["Robin", "Murciélago", "Joker", "Gotham"] },
+            { t: "Spiderman", f: ["Araña", "Red", "Trepamuros", "Peter"] },
+            { t: "Barbie", f: ["Muñeca", "Ken", "Rosa", "Rubia"] },
+            { t: "Star Wars", f: ["Espacio", "Jedi", "Láser", "Darth Vader"] },
+            { t: "Los Simpson", f: ["Amarillo", "Homer", "Dibujos", "Springfield"] },
+            { t: "Shrek", f: ["Ogro", "Verde", "Asno", "Fiona"] },
+            { t: "Juego de Tronos", f: ["Dragones", "Serie", "Invierno", "Stark"] },
+            { t: "Paella", f: ["Arroz", "Valencia", "Marisco", "Amarillo"] },
+            { t: "Hamburguesa", f: ["Carne", "Pan", "Queso", "McDonalds"] },
+            { t: "Helado", f: ["Frío", "Verano", "Sabor", "Cucurucho"] },
+            { t: "Palomitas", f: ["Cine", "Maíz", "Sal", "Microondas"] },
+            { t: "Desierto", f: ["Arena", "Calor", "Camello", "Agua"] },
+            { t: "Selva", f: ["Árboles", "Verde", "Tarzán", "Animales"] },
+            { t: "París", f: ["Francia", "Torre Eiffel", "Ciudad", "Amor"] },
+            { t: "Egipto", f: ["Pirámides", "Faraón", "Momia", "Nilo"] },
+            { t: "Messi", f: ["Fútbol", "Argentina", "Balón", "Gol"] },
+            { t: "Shakira", f: ["Cantante", "Colombia", "Piqué", "Bailar"] },
+            { t: "Dinero", f: ["Pagar", "Euros", "Billete", "Comprar"] },
+            { t: "Examen", f: ["Estudiar", "Colegio", "Nota", "Aprobar"] },
+            { t: "Semáforo", f: ["Rojo", "Verde", "Coche", "Cruzar"] },
+            { t: "Wifi", f: ["Internet", "Conexión", "Clave", "Router"] },
+            { t: "Pintalabios", f: ["Boca", "Maquillaje", "Color", "Rojo"] },
+            { t: "Cepillo de Dientes", f: ["Pasta", "Boca", "Limpiar", "Lavabo"] },
+            { t: "Papel Higiénico", f: ["Baño", "Rollo", "Limpiar", "Wáter"] },
+            { t: "Tiburón", f: ["Mar", "Dientes", "Aleta", "Peligroso"] },
+            { t: "Pingüino", f: ["Hielo", "Pájaro", "Polo Sur", "Volar"] },
+            { t: "Ajedrez", f: ["Tablero", "Piezas", "Rey", "Jaque"] },
+            { t: "Póker", f: ["Cartas", "Juego", "Apostar", "Casino"] },
+            { t: "Tenis", f: ["Raqueta", "Red", "Pelota", "Nadal"] },
+            { t: "Volcán", f: ["Lava", "Fuego", "Erupción", "Montaña"] },
+            { t: "Llave", f: ["Abrir", "Puerta", "Cerradura", "Metal"] },
+            { t: "Basura", f: ["Contenedor", "Tirar", "Bolsa", "Reciclar"] },
+
+            // --- +100 PALABRAS NUEVAS (Variadas) ---
+            // Famosos Históricos y Reales
+            { t: "Albert Einstein", f: ["Físico", "Pelo", "Relatividad", "Inteligente"] },
+            { t: "Cleopatra", f: ["Egipto", "Reina", "Julio César", "Belleza"] },
+            { t: "Leonardo da Vinci", f: ["Pintor", "Mona Lisa", "Inventor", "Renacimiento"] },
+            { t: "Michael Jackson", f: ["Cantante", "Pop", "Bailar", "Moonwalk"] },
+            { t: "Marilyn Monroe", f: ["Actriz", "Rubia", "Vestido", "Viento"] },
+            { t: "Elvis Presley", f: ["Rey", "Rock", "Cantante", "Tupé"] },
+            { t: "Julio César", f: ["Roma", "Emperador", "Cleopatra", "Imperio"] },
+            { t: "Mozart", f: ["Música", "Clásica", "Compositor", "Piano"] },
+            { t: "Picasso", f: ["Pintor", "Cuadros", "Cubismo", "Arte"] },
+            { t: "Frida Kahlo", f: ["Pintora", "México", "Cejas", "Diego Rivera"] },
+            { t: "Cristóbal Colón", f: ["Descubrir", "América", "Barcos", "España"] },
+            { t: "Maradona", f: ["Fútbol", "Argentina", "Dios", "Pelusa"] },
+            { t: "Rosalía", f: ["Cantante", "Motomami", "Uñas", "Flamenco"] },
+            { t: "Rafa Nadal", f: ["Tenis", "Raqueta", "Tierra", "Roland Garros"] },
+            { t: "Cristiano Ronaldo", f: ["Fútbol", "Portugués", "Goles", "Siete"] },
+            { t: "Fernando Alonso", f: ["Fórmula 1", "Coche", "Piloto", "Asturias"] },
+            { t: "Dalí", f: ["Pintor", "Relojes", "Bigote", "Surrealismo"] },
+            
+            // Personajes de Ficción
+            { t: "Bob Esponja", f: ["Mar", "Amarillo", "Patricio", "Pantalones"] },
+            { t: "Goku", f: ["Anime", "Dragon Ball", "Saiyan", "Kamehameha"] },
+            { t: "Darth Vader", f: ["Padre", "Oscuro", "Star Wars", "Respirar"] },
+            { t: "Sherlock Holmes", f: ["Detective", "Watson", "Lupa", "Pipa"] },
+            { t: "Frankenstein", f: ["Monstruo", "Tornillos", "Verde", "Creador"] },
+            { t: "Peter Pan", f: ["Volar", "Nunca Jamás", "Campanilla", "Niños"] },
+            { t: "Cenicienta", f: ["Zapatos", "Cristal", "Medianoche", "Princesa"] },
+            { t: "Blancanieves", f: ["Siete", "Enanitos", "Manzana", "Bruja"] },
+            { t: "Yoda", f: ["Verde", "Maestro", "Jedi", "Fuerza"] },
+            { t: "King Kong", f: ["Mono", "Gigante", "Edificio", "Nueva York"] },
+            { t: "Godzilla", f: ["Monstruo", "Japón", "Dinosaurio", "Destruir"] },
+            { t: "Tarzán", f: ["Selva", "Mono", "Lianas", "Jane"] },
+            { t: "Indiana Jones", f: ["Látigo", "Sombrero", "Aventura", "Película"] },
+            { t: "James Bond", f: ["Agente", "007", "Espía", "Película"] },
+            { t: "Hulk", f: ["Verde", "Fuerte", "Vengadores", "Enfadado"] },
+            { t: "Iron Man", f: ["Armadura", "Tony Stark", "Vengadores", "Rojo"] },
+            { t: "Capitán América", f: ["Escudo", "Vengadores", "Héroe", "Estrella"] },
+            { t: "Thor", f: ["Martillo", "Trueno", "Dios", "Vengadores"] },
+            { t: "Mafalda", f: ["Niña", "Cómic", "Sopa", "Quino"] },
+            { t: "Peppa Pig", f: ["Cerda", "Dibujos", "Rosa", "Barro"] },
+
+            // Lugares y Monumentos Famosos
+            { t: "Estatua de la Libertad", f: ["Nueva York", "Antorcha", "Verde", "Monumento"] },
+            { t: "Coliseo", f: ["Roma", "Gladiadores", "Italia", "Ruinas"] },
+            { t: "Muralla China", f: ["Asia", "Larga", "Construcción", "Piedra"] },
+            { t: "Taj Mahal", f: ["India", "Palacio", "Blanco", "Amor"] },
+            { t: "Machu Picchu", f: ["Perú", "Incas", "Montaña", "Ruinas"] },
+            { t: "Torre de Pisa", f: ["Italia", "Inclinada", "Caerse", "Monumento"] },
+            { t: "Londres", f: ["Inglaterra", "Big Ben", "Autobús rojo", "Ciudad"] },
+            { t: "Nueva York", f: ["Estados Unidos", "Rascacielos", "Central Park", "Manzana"] },
+            { t: "Tokio", f: ["Japón", "Sushi", "Ciudad", "Neón"] },
+            { t: "Polo Norte", f: ["Frío", "Papá Noel", "Hielo", "Osos"] },
+            { t: "Hawái", f: ["Isla", "Volcán", "Aloha", "Collar"] },
+            { t: "Venecia", f: ["Canales", "Góndola", "Agua", "Italia"] },
+            { t: "Australia", f: ["Canguro", "Koala", "Oceanía", "Isla"] },
+
+            // Curiosidades, Seres Fantásticos, y Profesiones
+            { t: "Dinosaurio", f: ["Extinto", "T-Rex", "Jurásico", "Meteorito"] },
+            { t: "Extraterrestre", f: ["Espacio", "Ovni", "Alien", "Verde"] },
+            { t: "Robot", f: ["Máquina", "Metal", "Inteligencia", "Futuro"] },
+            { t: "Unicornio", f: ["Caballo", "Cuerno", "Fantasía", "Arcoíris"] },
+            { t: "Sirena", f: ["Mar", "Cola", "Mujer", "Ariel"] },
+            { t: "Dragón", f: ["Fuego", "Volar", "Castillo", "Escamas"] },
+            { t: "Hada", f: ["Alas", "Magia", "Campanilla", "Bosque"] },
+            { t: "Ninja", f: ["Japón", "Espada", "Negro", "Silencioso"] },
+            { t: "Samurái", f: ["Japón", "Katana", "Guerrero", "Honor"] },
+            { t: "Momia", f: ["Egipto", "Vendas", "Pirámide", "Sarcófago"] },
+            { t: "Bruja", f: ["Escoba", "Magia", "Hechizo", "Sombrero"] },
+
+            // Cotidiano, Deportes, Objetos
+            { t: "Lotería", f: ["Premio", "Dinero", "Billete", "Suerte"] },
+            { t: "Montaña Rusa", f: ["Atracción", "Parque", "Bajar", "Mareo"] },
+            { t: "Circo", f: ["Payaso", "Carpa", "Acróbata", "Animales"] },
+            { t: "Supermercado", f: ["Comprar", "Carrito", "Comida", "Pagar"] },
+            { t: "Gimnasio", f: ["Pesas", "Deporte", "Sudar", "Fuerte"] },
+            { t: "Peluquería", f: ["Cortar", "Pelo", "Peinar", "Tijeras"] },
+            { t: "Tatuaje", f: ["Piel", "Tinta", "Aguja", "Dibujo"] },
+            { t: "Diamante", f: ["Joya", "Anillo", "Brillante", "Caro"] },
+            { t: "Pasaporte", f: ["Viajar", "Frontera", "Avión", "Documento"] },
+            { t: "Maleta", f: ["Viaje", "Ropa", "Equipaje", "Ruedas"] },
+            { t: "Telescopio", f: ["Estrellas", "Mirar", "Cielo", "Espacio"] },
+            { t: "Batería", f: ["Instrumento", "Tocar", "Palillos", "Ruido"] },
+            { t: "Flauta", f: ["Soplar", "Instrumento", "Agujeros", "Música"] },
+            { t: "Trompeta", f: ["Viento", "Instrumento", "Jazz", "Metal"] },
+            { t: "Violín", f: ["Cuerdas", "Arco", "Instrumento", "Clásica"] },
+            { t: "Piano", f: ["Teclas", "Blanco", "Negro", "Instrumento"] },
+            { t: "Ruleta", f: ["Casino", "Apostar", "Rojo", "Negro"] },
+            { t: "Dardos", f: ["Diana", "Lanzar", "Puntería", "Bar"] },
+            { t: "Billar", f: ["Mesa", "Bolas", "Palo", "Agujeros"] },
+            { t: "Bolos", f: ["Pista", "Tirar", "Bola", "Zapatos"] },
+            { t: "Cometa", f: ["Volar", "Viento", "Hilo", "Cielo"] },
+            { t: "Dron", f: ["Volar", "Cámara", "Mando", "Hélice"] },
+            { t: "Helicóptero", f: ["Volar", "Hélices", "Rescate", "Cielo"] },
+            { t: "Submarino", f: ["Agua", "Hundir", "Océano", "Periscopio"] },
+            
+            // Animales Especiales
+            { t: "Camaleón", f: ["Color", "Cambiar", "Reptil", "Lengua"] },
+            { t: "Canguro", f: ["Saltar", "Australia", "Bolsa", "Animal"] },
+            { t: "Koala", f: ["Árbol", "Eucalipto", "Australia", "Dormir"] },
+            { t: "Oso Panda", f: ["Blanco", "Negro", "Bambú", "China"] },
+            { t: "León", f: ["Rey", "Selva", "Melena", "Rugir"] },
+            { t: "Tigre", f: ["Rayas", "Felino", "Naranja", "Animal"] },
+            { t: "Elefante", f: ["Trompa", "Orejas", "Grande", "Marfil"] },
+            { t: "Cocodrilo", f: ["Dientes", "Río", "Reptil", "Verde"] },
+
+            // --- NUEVAS: para reírse y muy de aquí ---
+            { t: "Siesta", f: ["Dormir", "Tarde", "Sofá", "Comer"] },
+            { t: "Resaca", f: ["Alcohol", "Dolor de cabeza", "Mañana", "Fiesta"] },
+            { t: "Cuñado", f: ["Familia", "Hermano", "Saber", "Navidad"] },
+            { t: "Suegra", f: ["Madre", "Pareja", "Familia", "Casa"] },
+            { t: "Selfie", f: ["Foto", "Móvil", "Cara", "Instagram"] },
+            { t: "Karaoke", f: ["Cantar", "Micrófono", "Canción", "Bar"] },
+            { t: "Tinder", f: ["Ligar", "App", "Cita", "Deslizar"] },
+            { t: "Pedo", f: ["Gas", "Olor", "Ruido", "Culo"] },
+            { t: "Eructo", f: ["Boca", "Gas", "Ruido", "Cerveza"] },
+            { t: "Hipo", f: ["Aire", "Susto", "Agua", "Respirar"] },
+            { t: "Cosquillas", f: ["Reír", "Pies", "Tocar", "Barriga"] },
+            { t: "Calzoncillos", f: ["Ropa interior", "Hombre", "Bóxer", "Slip"] },
+            { t: "Chancla", f: ["Pie", "Verano", "Madre", "Playa"] },
+            { t: "Mando de la tele", f: ["Canal", "Sofá", "Pilas", "Botón"] },
+            { t: "Despertador", f: ["Alarma", "Mañana", "Sonar", "Levantarse"] },
+            { t: "Lunes", f: ["Semana", "Domingo", "Trabajo", "Día"] },
+            { t: "Atasco", f: ["Coches", "Tráfico", "Carretera", "Parado"] },
+            { t: "Mosquito", f: ["Picar", "Verano", "Zumbido", "Sangre"] },
+            { t: "Churros", f: ["Chocolate", "Desayuno", "Freír", "Porras"] },
+            { t: "Croqueta", f: ["Jamón", "Frita", "Bechamel", "Abuela"] },
+            { t: "Gazpacho", f: ["Tomate", "Frío", "Andalucía", "Sopa"] },
+            { t: "Jamón", f: ["Cerdo", "Ibérico", "Pata", "Cortar"] },
+            { t: "Sangría", f: ["Vino", "Fruta", "Jarra", "Verano"] },
+            { t: "Nochevieja", f: ["Uvas", "Campanadas", "Año", "Diciembre"] },
+            { t: "Reyes Magos", f: ["Regalos", "Enero", "Melchor", "Camello"] },
+            { t: "San Fermín", f: ["Toros", "Pamplona", "Correr", "Rojo"] },
+            { t: "Operación Triunfo", f: ["Cantar", "Academia", "Concurso", "Tele"] },
+            { t: "Gran Hermano", f: ["Casa", "Cámaras", "Concurso", "Expulsar"] },
+            { t: "La Casa de Papel", f: ["Atraco", "Máscara", "Netflix", "Profesor"] },
+            { t: "Pokémon", f: ["Pikachu", "Atrapar", "Bola", "Entrenador"] },
+            { t: "Super Mario", f: ["Fontanero", "Seta", "Bigote", "Nintendo"] },
+            { t: "Tetris", f: ["Piezas", "Encajar", "Juego", "Línea"] },
+            { t: "Minions", f: ["Amarillo", "Gru", "Plátano", "Gafas"] },
+            { t: "Pinocho", f: ["Nariz", "Mentira", "Madera", "Geppetto"] },
+            { t: "Caperucita Roja", f: ["Lobo", "Abuela", "Bosque", "Cesta"] },
+            { t: "Calvo", f: ["Pelo", "Cabeza", "Brillo", "Peluca"] },
+            { t: "Pijama", f: ["Dormir", "Ropa", "Noche", "Cama"] },
+
+            // --- RECUPERADAS ---
+            { t: "Volante", f: ["Coche", "Conducir", "Girar", "Manos"] },
+            { t: "Imán", f: ["Atraer", "Metal", "Nevera", "Pegar"] },
+            { t: "Brújula", f: ["Norte", "Sur", "Guía", "Flecha"] },
+            { t: "Mapa", f: ["Perderse", "Buscar", "Papel", "Coordenadas"] },
+            { t: "Gran Cañón", f: ["Colorado", "Agujero", "Estados Unidos", "Río"] },
+            { t: "Google", f: ["Buscador", "Internet", "Escribir", "Web"] },
+
+            // --- NUEVAS: internet, videojuegos y actualidad ---
+            { t: "Inteligencia Artificial", f: ["Robot", "ChatGPT", "Ordenador", "Pensar"] },
+            { t: "ChatGPT", f: ["IA", "Preguntar", "Chat", "OpenAI"] },
+            { t: "Minecraft", f: ["Bloques", "Construir", "Creeper", "Videojuego"] },
+            { t: "League of Legends", f: ["LoL", "Campeones", "Videojuego", "Riot"] },
+            { t: "Twitter", f: ["Pájaro", "X", "Tuit", "Elon Musk"] },
+            { t: "Fortnite", f: ["Battle royale", "Bailes", "Videojuego", "Construir"] },
+            { t: "Twitch", f: ["Directo", "Streamer", "Morado", "Chat"] },
+            { t: "Streamer", f: ["Directo", "Twitch", "Jugar", "Cámara"] },
+            { t: "Influencer", f: ["Instagram", "Seguidores", "Publicidad", "Famoso"] },
+            { t: "Meme", f: ["Gracioso", "Imagen", "Internet", "Compartir"] },
+            { t: "Podcast", f: ["Escuchar", "Hablar", "Episodio", "Micrófono"] },
+            { t: "Emoji", f: ["Cara", "WhatsApp", "Icono", "Mensaje"] },
+            { t: "Among Us", f: ["Impostor", "Nave", "Tripulante", "Votar"] },
+            { t: "GTA", f: ["Coches", "Robar", "Videojuego", "Ciudad"] },
+            { t: "Roblox", f: ["Videojuego", "Niños", "Bloques", "Robux"] },
+            { t: "PlayStation", f: ["Sony", "Consola", "Mando", "Jugar"] },
+            { t: "Nintendo Switch", f: ["Consola", "Mario", "Portátil", "Mandos"] },
+            { t: "iPhone", f: ["Apple", "Móvil", "Manzana", "Caro"] },
+            { t: "AirPods", f: ["Auriculares", "Apple", "Blancos", "Oídos"] },
+            { t: "Bizum", f: ["Dinero", "Enviar", "Móvil", "Pagar"] },
+            { t: "Glovo", f: ["Comida", "Domicilio", "Repartidor", "Pedido"] },
+            { t: "Wallapop", f: ["Vender", "Segunda mano", "App", "Comprar"] },
+            { t: "Patinete eléctrico", f: ["Ruedas", "Batería", "Ciudad", "Acera"] },
+            { t: "Bitcoin", f: ["Criptomoneda", "Dinero", "Invertir", "Virtual"] },
+            { t: "Spoiler", f: ["Serie", "Final", "Contar", "Película"] },
+            { t: "Hater", f: ["Odiar", "Criticar", "Redes", "Comentarios"] },
+            { t: "El juego del calamar", f: ["Serie", "Coreana", "Muñeca", "Netflix"] },
+            { t: "Stranger Things", f: ["Serie", "Netflix", "Once", "Demogorgon"] },
+            { t: "Ibai", f: ["Twitch", "Streamer", "Velada", "Vasco"] },
+            { t: "Bad Bunny", f: ["Reguetón", "Puerto Rico", "Cantante", "Conejo"] },
+            { t: "Taylor Swift", f: ["Cantante", "Gira", "Rubia", "Swifties"] },
+            { t: "Lamine Yamal", f: ["Fútbol", "Barça", "Joven", "Selección"] },
+            { t: "Eurovisión", f: ["Festival", "Canción", "Países", "Votar"] },
+            { t: "Discord", f: ["Chat", "Servidor", "Voz", "Gamers"] },
+            { t: "Duolingo", f: ["Idiomas", "Búho", "Racha", "App"] },
+            { t: "Clash Royale", f: ["Cartas", "Torres", "Móvil", "Supercell"] },
+            { t: "Zoom", f: ["Videollamada", "Reunión", "Cámara", "Pantalla"] }
+        ];
+
+        const wordTarget = document.getElementById("wordTarget");
+        const lista = document.getElementById("wordForbidden");
+
+        TurnGame({
+            key: 'tabu',
+            items: dbOriginal,
+            idOf: (carta) => carta.t,
+            readyHint: 'Pásale el móvil a quien vaya a describir',
+            render(carta) {
+                wordTarget.innerText = carta.t;
+                lista.innerHTML = "";
+                carta.f.forEach(palabra => {
+                    const li = document.createElement("div");
+                    li.className = "forbidden-word";
+                    li.innerText = palabra;
+                    lista.appendChild(li);
+                });
+            }
+        });
+        G.segmented();
+    </script>
+</body>
+</html>

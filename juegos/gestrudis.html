@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#14112b">
+<title>Gestrudis · Mímica con amigos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#14112b;
+  --panel:#221c4a;
+  --line:rgba(255,255,255,.09);
+  --text:#fff7ec;
+  --muted:#aaa3cf;
+  --accent:#ff5d73;
+  --ok:#3ddc97;
+  --warn:#ffc145;
+  --display:'Fredoka','Trebuchet MS',system-ui,sans-serif;
+  --body:'Nunito',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{height:100%}
+body{
+  min-height:100dvh;
+  color:var(--text);
+  font-family:var(--body);
+  background:
+    radial-gradient(900px 520px at 0% -10%, #3b2577 0%, transparent 60%),
+    radial-gradient(800px 480px at 110% 110%, #5b1d4c 0%, transparent 55%),
+    var(--bg);
+  background-attachment:fixed;
+  overscroll-behavior:none;
+}
+
+/* ---------- Pantallas ---------- */
+.screen{
+  display:none;
+  flex-direction:column;
+  min-height:100dvh;
+  width:100%;
+  max-width:1200px;
+  margin:0 auto;
+  padding:max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom));
+}
+.screen.active{display:flex}
+
+/* ---------- Botones ---------- */
+.btn{
+  all:unset;
+  box-sizing:border-box;
+  flex:1;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  min-height:58px;
+  padding:14px 18px;
+  border-radius:16px;
+  cursor:pointer;
+  text-align:center;
+  font-family:var(--display);
+  font-weight:600;
+  font-size:20px;
+  color:var(--text);
+  background:rgba(255,255,255,.08);
+  border:1px solid var(--line);
+  transition:transform .1s ease, filter .15s ease, background .15s ease;
+  user-select:none;
+}
+.btn:hover{filter:brightness(1.12)}
+.btn:active{transform:scale(.97)}
+.btn:focus-visible{outline:3px solid var(--warn);outline-offset:3px}
+.btn.primary{background:var(--ok);color:#0b2a1d;border-color:transparent;box-shadow:0 10px 26px rgba(61,220,151,.28)}
+.btn.next{background:var(--accent);color:#fff;border-color:transparent;box-shadow:0 10px 26px rgba(255,93,115,.3)}
+.btn.grow{flex:2}
+.btn.small{flex:none;min-height:42px;padding:8px 14px;font-size:16px;border-radius:12px}
+
+/* ---------- Selección ---------- */
+#screen-select{position:relative}
+.home-link{position:absolute;left:16px;top:max(16px, env(safe-area-inset-top))}
+.brand{text-align:center;padding:6px 0 18px}
+.round-pill{
+  display:inline-block;
+  font-family:var(--display);font-weight:600;font-size:14px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--muted);
+  padding:5px 12px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.04);
+  margin-bottom:10px;
+}
+.logo{
+  font-family:var(--display);
+  font-weight:700;
+  font-size:clamp(40px, 9vw, 64px);
+  line-height:1;
+  letter-spacing:-.01em;
+  background:linear-gradient(95deg, #ff5d73 0%, #ff8a3d 45%, #ffc145 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.tag{margin-top:10px;color:var(--muted);font-size:15px;line-height:1.4}
+.tag b{color:var(--text)}
+
+.grid{display:grid;grid-template-columns:1fr;gap:14px}
+
+.pick{
+  all:unset;
+  box-sizing:border-box;
+  display:block;
+  position:relative;
+  overflow:hidden;
+  cursor:pointer;
+  padding:16px 16px 18px;
+  border-radius:20px;
+  background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.015)), var(--panel);
+  border:1px solid var(--line);
+  box-shadow:0 12px 30px rgba(0,0,0,.28);
+  transition:transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+  animation:rise .4s ease both;
+}
+.pick::before{content:'';position:absolute;left:0;right:0;top:0;height:5px;background:var(--c)}
+.pick:hover{transform:translateY(-3px);border-color:var(--c);box-shadow:0 16px 36px rgba(0,0,0,.35)}
+.pick:active{transform:scale(.98)}
+.pick:focus-visible{outline:3px solid var(--c);outline-offset:3px}
+
+.head{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.emoji{
+  flex:none;
+  width:46px;height:46px;border-radius:14px;
+  display:grid;place-items:center;
+  font-size:26px;line-height:1;
+  background:rgba(255,255,255,.07);
+  box-shadow:inset 0 0 0 2px var(--c);
+}
+.pick .title{font-family:var(--display);font-weight:600;font-size:21px;line-height:1.15;color:var(--c)}
+
+.pick-list{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:9px 14px}
+.pick-list li{display:flex;align-items:flex-start;gap:8px;font-size:15px;line-height:1.25;color:#ece8ff}
+.num{
+  flex:none;
+  display:grid;place-items:center;
+  border-radius:50%;
+  font-family:var(--display);font-weight:700;
+  background:var(--c);color:#1a1433;
+}
+.pick-list .num{width:22px;height:22px;font-size:13px;margin-top:-1px}
+
+.select-foot{
+  position:sticky;bottom:0;
+  margin-top:auto;
+  padding:18px 0 4px;
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  background:linear-gradient(180deg, transparent, var(--bg) 40%);
+}
+.select-foot .btn{width:100%;max-width:420px;flex:none}
+.deck-info{color:var(--muted);font-size:13px}
+
+/* ---------- Juego ---------- */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+.topbar .round{font-family:var(--display);font-weight:600;color:var(--muted);font-size:16px;letter-spacing:.04em}
+
+.play{display:flex;flex-direction:column;gap:16px;flex:1;min-height:0}
+
+.big-card{
+  position:relative;overflow:hidden;
+  padding:20px 18px 18px;
+  border-radius:24px;
+  background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.015)), var(--panel);
+  border:1px solid var(--line);
+  box-shadow:0 16px 40px rgba(0,0,0,.35);
+  animation:rise .35s ease both;
+}
+.big-card::before{content:'';position:absolute;left:0;right:0;top:0;height:6px;background:var(--c)}
+.big-card .head{margin-bottom:14px}
+.big-card .emoji{width:54px;height:54px;font-size:32px;border-radius:16px}
+.big-card h2{font-family:var(--display);font-weight:600;font-size:clamp(24px, 6vw, 40px);line-height:1.08;color:var(--c)}
+
+.big-list{list-style:none;display:grid;grid-template-columns:1fr;gap:8px}
+.big-list li{
+  display:flex;align-items:center;gap:12px;
+  padding:7px 10px;
+  border-radius:14px;
+  background:rgba(255,255,255,.045);
+  font-weight:800;
+  font-size:clamp(18px, 5vw, 26px);
+  line-height:1.15;
+}
+.big-list .num{width:1.6em;height:1.6em;font-size:.82em}
+
+.timer-wrap{flex:1;display:grid;place-items:center;min-height:0;padding:4px 0}
+.ring{
+  position:relative;
+  width:min(58vw, 30dvh, 300px);
+  aspect-ratio:1;
+  container-type:inline-size;
+  cursor:pointer;
+  user-select:none;
+}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg);display:block}
+.ring .track{fill:none;stroke:rgba(255,255,255,.08);stroke-width:9}
+.ring .prog{fill:none;stroke:var(--ok);stroke-width:9;stroke-linecap:round;transition:stroke .3s ease}
+.ring.warn .prog{stroke:var(--warn)}
+.ring.danger .prog,.ring.done .prog{stroke:var(--accent)}
+.ring-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+#timer{font-family:var(--display);font-weight:700;font-size:40cqw;line-height:1;font-variant-numeric:tabular-nums;transition:color .3s ease}
+#timer-sub{margin-top:2px;font-size:7.5cqw;color:var(--muted);font-weight:800;letter-spacing:.05em;text-transform:uppercase;min-height:1.2em}
+.ring.warn #timer{color:var(--warn)}
+.ring.danger #timer{color:var(--accent);animation:pulse 1s ease-in-out infinite}
+.ring.done #timer{color:var(--accent);font-size:17cqw;animation:pop .45s ease both}
+
+.controls{display:flex;gap:10px;margin-top:14px}
+
+.flash{animation:flash .9s ease}
+
+/* ---------- Animaciones ---------- */
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+@keyframes pop{0%{transform:scale(.6);opacity:0}70%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+@keyframes flash{0%,100%{box-shadow:inset 0 0 0 0 rgba(255,93,115,0)}25%{box-shadow:inset 0 0 0 14px rgba(255,93,115,.75)}}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation:none !important;transition:none !important}
+}
+
+/* ---------- Responsive ---------- */
+@media (min-width:700px){
+  .screen{padding-left:28px;padding-right:28px}
+  .grid{grid-template-columns:1fr 1fr;gap:18px}
+  .pick{padding:18px 20px 20px}
+  .pick-list li{font-size:16px}
+  .big-list{grid-template-columns:1fr 1fr;gap:10px 12px}
+  .big-list li{font-size:clamp(20px, 3.4vw, 30px)}
+  .controls{max-width:640px;width:100%;margin-left:auto;margin-right:auto}
+}
+
+/* Horizontal (tablet/portátil, o móvil tumbado): carta a la izquierda, temporizador a la derecha */
+@media (orientation:landscape) and (min-width:640px){
+  .play{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);align-items:center;gap:24px}
+  .big-list{grid-template-columns:1fr;gap:min(10px, 1.4dvh)}
+  .big-list li{font-size:clamp(16px, min(2.5vw, 4.6dvh), 34px);padding:min(8px, 1.2dvh) 12px}
+  .big-card h2{font-size:clamp(20px, min(3.2vw, 6dvh), 42px)}
+  .big-card .head{margin-bottom:min(14px, 2dvh)}
+  .ring{width:min(30vw, 52dvh, 380px)}
+}
+/* Móviles bajitos en vertical (iPhone SE y similares) */
+@media (orientation:portrait) and (max-height:740px){
+  .topbar{margin-bottom:10px}
+  .btn.small{min-height:38px}
+  .big-card{padding:16px 14px 14px}
+  .big-card .head{margin-bottom:10px}
+  .big-card .emoji{width:44px;height:44px;font-size:26px}
+  .big-card h2{font-size:24px}
+  .big-list{gap:6px}
+  .big-list li{padding:5px 10px;font-size:18px}
+  .play{gap:10px}
+  .ring{width:min(54vw, 27dvh)}
+  .controls{margin-top:10px}
+  .btn{min-height:54px}
+}
+@media (orientation:landscape) and (max-height:500px){
+  .screen{padding-top:10px;padding-bottom:10px}
+  .topbar{margin-bottom:8px}
+  .big-card{padding:12px 14px}
+  .big-card .emoji{width:40px;height:40px;font-size:24px}
+  .controls{margin-top:8px}
+  .btn{min-height:48px;font-size:18px}
+}
+</style>
+</head>
+<body>
+
+<!-- PANTALLA 1: ELEGIR CARTA -->
+<section id="screen-select" class="screen active" aria-label="Elegir carta">
+  <a class="btn small home-link" href="../index.html">← Juegos</a>
+  <header class="brand">
+    <div class="round-pill" id="round-pill">Ronda 1</div>
+    <h1 class="logo">Gestrudis</h1>
+    <p class="tag">Elige una carta, reparte un <b>número del 1 al 6</b> a cada jugador<br>y… ¡mímica durante <b>30 segundos</b>!</p>
+  </header>
+
+  <div class="grid" id="grid"></div>
+
+  <footer class="select-foot">
+    <button class="btn" id="btn-shuffle" type="button">🔀 Ver otras 4 cartas</button>
+    <p class="deck-info" id="deck-info"></p>
+  </footer>
+</section>
+
+<!-- PANTALLA 2: JUGAR -->
+<section id="screen-play" class="screen" aria-label="Ronda en juego">
+  <div class="topbar">
+    <button class="btn small" id="btn-back" type="button">← Cartas</button>
+    <div class="round" id="round-label">Ronda 1</div>
+    <button class="btn small" id="btn-sound" type="button" aria-label="Sonido">🔊</button>
+  </div>
+
+  <main class="play">
+    <article class="big-card" id="big-card">
+      <div class="head">
+        <span class="emoji" id="big-emoji"></span>
+        <h2 id="big-title"></h2>
+      </div>
+      <ol class="big-list" id="big-list"></ol>
+    </article>
+
+    <div class="timer-wrap">
+      <div class="ring" id="ring" role="timer" aria-live="off" title="Toca para empezar o pausar">
+        <svg viewBox="0 0 120 120" aria-hidden="true">
+          <circle class="track" cx="60" cy="60" r="54"/>
+          <circle class="prog" id="prog" cx="60" cy="60" r="54"/>
+        </svg>
+        <div class="ring-label">
+          <span id="timer">30</span>
+          <span id="timer-sub">segundos</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="controls" id="controls"></div>
+</section>
+
+<script src="../shared/common.js"></script>
+<script>
+/* =========================================================
+   MAZO: [emoji, tema, [6 opciones]]
+   ========================================================= */
+const RAW = [
+  // --- Acciones y gestos ---
+  ['✋','Acciones con las manos',['Acariciar','Agarrar','Empujar','Rascar','Pegar','Hacer cosquillas']],
+  ['😭','Emociones',['Llorar','Reír a carcajadas','Asustarse','Enfadarse','Sorprenderse','Enamorarse']],
+  ['🥶','Sensaciones',['Tener frío','Tener calor','Tener sueño','Tener hambre','Tener prisa','Tener vértigo']],
+  ['😤','Personalidades',['Tímido','Pesado','Presumido','Despistado','Gruñón','Cotilla']],
+  ['🤥','Mentirijillas',['Mentir','Decir la verdad','Ser pillado','Disimular','Señalar a otro','Poner cara de inocente']],
+  ['👀','Cotillas',['Espiar','Escuchar detrás de una puerta','Mirar por una ventana','Seguir a alguien','Esconderse','Usar prismáticos']],
+  ['🤕','¡Ay, qué dolor!',['Dolor de cabeza','Dolor de tripa','Torcerse el tobillo','Quemarse el dedo','Dolor de muelas','Golpe en el codo']],
+  ['🤧','Resfriado',['Estornudar','Toser','Sonarse','Tener alergia','Beber agua','Tomar un caramelo']],
+  ['🔑','Despistes',['Buscar las llaves','Buscar el móvil','Perder un calcetín','Tropezarse','Cerrar con llave','Llegar tarde']],
+  ['🥤','Pequeños retos',['Beber de una botella','Abrir un tarro','Partir una nuez','Comer con palillos','Quemarse con café','Tener hipo']],
+  ['🙄','Excusas absurdas',['El perro se comió los deberes','No sonó la alarma','Se me fue el santo al cielo','Había mucho tráfico','Pensaba que era mañana','Se me murió el móvil']],
+
+  // --- Día a día ---
+  ['🪥','Aseo personal',['Cepillarse los dientes','Ponerse desodorante','Peinarse','Lavarse la cara','Cortarse las uñas','Mirarse en el espejo']],
+  ['🚿','En la ducha',['Agua helada','Cantar en la ducha','Quedarse sin agua caliente','Champú en los ojos','Resbalar en la bañera','Secarse con la toalla']],
+  ['💄','Arreglarse',['Maquillarse','Afeitarse','Pintarse las uñas','Secarse el pelo','Ponerse lentillas','Echarse perfume']],
+  ['👖','Vestirse',['Ponerse unos vaqueros apretados','Atarse los zapatos','Hacerse el nudo de la corbata','Abrocharse los botones','Ponerse unas medias','Quitarse un jersey']],
+  ['😴','Hora de dormir',['Dormirse en el sofá','Dar vueltas en la cama','Apagar el despertador','Bostezar','Soñar','Despertarse sobresaltado']],
+  ['🌙','De noche',['Contar ovejas','Ver una estrella fugaz','Aullar a la luna','Ser sonámbulo','Ir a por agua a oscuras','Oír ronquidos']],
+  ['🧹','Tareas de casa',['Barrer','Planchar','Lavar los platos','Limpiar los cristales','Tender la ropa','Pasar la aspiradora']],
+  ['🚽','En el baño',['Ir al baño','Tirar de la cadena','Quedarse sin papel','Lavarse las manos','Mirar el móvil','Cerrar la puerta']],
+  ['🚏','Esperando',['Hacer cola','Colarse','Esperar el autobús','Perder el autobús','Correr para llegar','Mirar el reloj']],
+  ['🚇','Transporte público',['Metro lleno','Agarrarse a la barra','Ceder el asiento','Picar el billete','Pasarse de parada','Músico ambulante']],
+  ['🚦','Tráfico',['Atasco','Semáforo en rojo','Aparcar en paralelo','Multa de aparcamiento','Rotonda','La grúa se lleva el coche']],
+  ['🚗','Al volante',['Conducir','Cambiar una rueda','Poner gasolina','Pitar','Limpiar el parabrisas','Tener un choque']],
+  ['📦','La mudanza',['Cargar cajas','Montar un mueble de IKEA','Subir un sofá por la escalera','Pintar la pared','Colgar un cuadro','Perder un tornillo']],
+  ['🔨','Bricolaje',['Martillar','Taladrar','Serrar','Atornillar','Lijar','Darse en el dedo']],
+  ['🌱','En el jardín',['Regar las plantas','Cortar el césped','Plantar semillas','Arrancar malas hierbas','Podar un árbol','Picadura de abeja']],
+  ['🐕','Paseando al perro',['Recoger la caca','Tirar la pelota','Tirar de la correa','Ser arrastrado por el perro','Perro que se escapa','Dar una chuche']],
+  ['👶','Bebés',['Cambiar un pañal','Dar el biberón','Hacer eructar al bebé','Mecer la cuna','Gatear','Primeros pasos']],
+  ['🍼','Niños pequeños',['Rabieta','Pedir upa','Chuparse el dedo','Esconderse detrás de mamá','Hacer pompas de jabón','Montar en el columpio']],
+  ['👵','Cosas de abuelos',['Hacer punto','Dar de comer a las palomas','Mirar una obra','Echarse la siesta','Jugar a la petanca','Dar la paga a los nietos']],
+  ['🧘','Relax',['Meditar','Recibir un masaje','Darse un baño de espuma','Tumbarse en la hamaca','Ponerse una mascarilla','Escuchar música con cascos']],
+
+  // --- Comida y bebida ---
+  ['🍝','Comer con estilo',['Comer espaguetis','Masticar chicle','Tomar sopa','Pelar un plátano','Lamer un helado','Morder una manzana']],
+  ['☕','Desayuno',['Mojar galletas en la leche','Hacer café','Tostar pan','Untar mantequilla','Beber zumo','Comerse las migas']],
+  ['🍳','En la cocina',['Cocinar pasta','Romper un huevo','Remover una sopa','Cortar cebolla','Probar con una cuchara','Quemar la comida']],
+  ['🍖','Barbacoa',['Dar la vuelta a una hamburguesa','Avivar el fuego','Quemar una salchicha','Comer demasiado','Echar salsa','Espantar el humo']],
+  ['🍕','Comidas',['Pizza','Hamburguesa','Tortilla de patatas','Paella','Sushi','Tacos']],
+  ['🥘','Comida española',['Gazpacho','Jamón','Croquetas','Churros con chocolate','Pulpo a la gallega','Bocadillo de calamares']],
+  ['🍜','Comida del mundo',['Ramen','Kebab','Perrito caliente','Fondue','Curry','Cruasán']],
+  ['🍉','Frutas',['Plátano','Sandía','Piña','Coco','Limón','Uvas']],
+  ['🍭','Dulces',['Helado','Chocolate','Gominolas','Churros','Palomitas','Algodón de azúcar']],
+  ['🌶️','Sabores',['Picante','Ácido','Dulce','Amargo','Salado','Muy caliente']],
+  ['🍽️','En el restaurante',['Leer la carta','Llamar al camarero','Probar la comida','Pedir la cuenta','Quejarse de la comida','Dejar propina']],
+
+  // --- Fiesta, música y ocio ---
+  ['🎂','Cumpleaños',['Abrir un regalo','Envolver un regalo','Soplar velas','Comer tarta','Tirar confeti','Hacer una foto de cumpleaños']],
+  ['🪩','Noche de fiesta',['Hacer cola en la discoteca','Bailar reguetón','Hacer karaoke','Tropezarse bailando','Quedarse afónico','Dormirse de madrugada']],
+  ['🍻','Fiesta loca',['Estar borracho','Tener resaca','Brindar','Derramar una bebida','Bailar encima de una mesa','Dormirse en una fiesta']],
+  ['💃','Bailes',['Bailar salsa','Bailar rock','Hacer breakdance','Bailar ballet','Hacer twerking','Bailar como un robot']],
+  ['🕺','Bailes populares',['Sevillanas','Tango','La Macarena','Jota','Conga','Vals']],
+  ['🎤','A cantar',['Cantar fatal','Cantar ópera','Rapear','Tararear','Silbar','Quedarse sin voz']],
+  ['🤘','Estrella del rock',['Tocar la guitarra imaginaria','Tocar la batería imaginaria','Dirigir una orquesta','Tirarse al público','Hacer una reverencia','Recibir aplausos']],
+  ['🎸','Instrumentos',['Guitarra','Batería','Violín','Trompeta','Piano','Flauta']],
+  ['🪗','Instrumentos curiosos',['Arpa','Acordeón','Saxofón','Gaita','Castañuelas','Triángulo']],
+  ['🎳','Ocio con amigos',['Bolos','Billar','Dardos','Futbolín','Ping-pong','Minigolf']],
+  ['🎲','Juegos de mesa',['Monopoly','Risk','Cluedo','Ajedrez','Parchís','Trivial']],
+  ['🎰','Casino',['Ruleta','Dados','Blackjack','Crupier','Máquina tragaperras','Ganar el bote']],
+  ['🪀','Juegos de patio',['El escondite','Pilla-pilla','Saltar a la comba','Bailar la peonza','La rayuela','Gallinita ciega']],
+  ['🧒','Juegos infantiles',['Las estatuas','Balón prisionero','Sillas musicales','Simón dice','Piedra, papel o tijera','Teléfono escacharrado']],
+  ['🧩','Aficiones',['Hacer puzles','Hacer crucigramas','Tocar el ukelele','Hacer origami','Observar pájaros','Montar maquetas']],
+  ['🎨','Arte',['Pintar un cuadro','Esculpir','Hacer cerámica','Posar como modelo','Hacer un grafiti','Estatua viviente']],
+  ['🎪','El circo',['Malabarista','Domador de leones','Trapecista','Equilibrista','Hombre bala','Tragasables']],
+  ['🎢','Parque de atracciones',['Montaña rusa','Noria','Coches de choque','Casa del terror','Tiovivo','Caída libre']],
+  ['🪄','Magia',['Sacar un conejo de la chistera','Serrar a una persona','Hacer levitar algo','Truco de cartas','Desaparecer','Hipnotizar']],
+  ['🎭','Fiesta de disfraces',['Vestirse de payaso','Vestirse de vampiro','Ponerse una máscara','No reconocer a alguien','Quitarse el disfraz','Pintarse la cara']],
+
+  // --- Fechas señaladas ---
+  ['🎃','Halloween',['Truco o trato','Tallar una calabaza','Fantasma','Bruja','Casa encantada','Momia']],
+  ['🎄','Navidad',['Papá Noel','Abrir regalos','Poner el árbol','Comer turrón','Cantar villancicos','Reyes Magos']],
+  ['🥂','Nochevieja',['Comer las uvas','Cuenta atrás','Brindar','Fuegos artificiales','Bailar hasta tarde','Resaca de Año Nuevo']],
+  ['💍','Boda',['Vestido de novia','Anillos','Ramo','Banquete','Luna de miel','Primer baile']],
+  ['🎉','Fiestas de España',['San Fermín','Las Fallas','La Tomatina','Feria de Abril','Carnaval','Semana Santa']],
+  ['🏆','Celebraciones',['Levantar una copa','Subir al podio','Abrir champán','Dar la vuelta de honor','Mantear al entrenador','Morder la medalla']],
+
+  // --- Amor ---
+  ['😘','Ligoteo',['Ligar','Dar un beso','Hacer un corazón','Poner cara de seductor','Rechazar a alguien','Ponerse celoso']],
+
+  // --- Tecnología ---
+  ['💻','Frente al ordenador',['Escribir en el teclado','Usar el ratón','Enfadarse con la pantalla','Jugar online con cascos','Hacerse una foto','Romper el monitor']],
+  ['💬','El móvil',['WhatsApp','Videollamada','Mensaje de voz','Llamada perdida','Grupo familiar','Emoji']],
+  ['🤳','Influencers',['Ser influencer','Grabar un vídeo','Hacer un unboxing','Hacer un tutorial','Leer comentarios','Borrar un vídeo']],
+  ['🔋','Desastres tecnológicos',['Contraseña olvidada','Wi-Fi sin señal','Batería al 1%','Pantalla rota','Actualización interminable','Ordenador congelado']],
+  ['💡','Luces y sombras',['Encender una bombilla','Deslumbrarse','Hacer sombras chinas','Apagar una vela','Usar una linterna','Fuego artificial']],
+
+  // --- Trabajo y estudios ---
+  ['🧑‍💻','Teletrabajo',['Trabajar en pijama','Apagar la cámara','Silenciar el micrófono','Hablar sin micrófono','Compartir pantalla','Entrar a una reunión equivocada']],
+  ['📝','Exámenes',['Morderse el boli','Copiar','Estudiar la noche anterior','Quedarse en blanco','Levantar la mano','Entregar el examen']],
+  ['🎒','Primer día de cole',['Llorar en la puerta','Hacer amigos','Llevar la mochila pesada','Sacar punta al lápiz','Comer en el comedor','Salir al recreo']],
+  ['👨‍🚒','Profesiones',['Bombero','Policía','Médico','Cocinero','Fotógrafo','Peluquero']],
+  ['🕵️','Profesiones de película',['Abogado','Astronauta','Detective','Piloto','Científico','Espía']],
+  ['🔧','Oficios',['Fontanero','Electricista','Mecánico','Carpintero','Albañil','Jardinero']],
+  ['🎙️','Gente famosa',['Político','Presentador','Periodista','Actor','Cantante','Modelo']],
+  ['🎥','Rodaje de cine',['Director de cine','Doble de acción','Claqueta','Alfombra roja','Recibir un Óscar','Firmar autógrafos']],
+  ['🧪','Científico loco',['Mezclar líquidos','Mirar por un microscopio','Provocar una explosión','Ponerse gafas protectoras','Probar una pócima','Crear un monstruo']],
+  ['💸','Dinero',['Contar billetes','Sacar del cajero','Encontrar una moneda','Romper la hucha','Ganar la lotería','Arruinarse']],
+  ['🛍️','De compras',['Probarse ropa','Regatear','Pagar en efectivo','Devolver algo','Rebajas','Cargar con mil bolsas']],
+
+  // --- Salud ---
+  ['🦷','En el dentista',['Abrir la boca','Escupir en el lavabo','Taladro dental','Enjuague bucal','Dolor de muelas','Boca dormida por la anestesia']],
+  ['🏥','Revisión médica',['Hacer una radiografía','Ponerse una bata','Pesarse en una báscula','Tomarse la tensión','Usar un termómetro','Recibir una inyección']],
+  ['🩼','Lesionados',['Llevar muletas','Llevar una escayola','Usar silla de ruedas','Caerse','Resbalar','Poner hielo']],
+  ['🚨','Emergencias',['Apagar un incendio','Rescatar un gato de un árbol','Hacer el boca a boca','Llamar al 112','Sirena de ambulancia','Evacuar un edificio']],
+
+  // --- Aventura y misterio ---
+  ['🚔','Policías y ladrones',['Ladrón','Detective','Policía secreto','Testigo','Prisionero','Fugitivo']],
+  ['💰','El gran atraco',['Ser un ladrón','Robar un banco','Escapar corriendo','Abrir una caja fuerte','Llevar máscara','Ser detenido']],
+  ['🕶️','Agente secreto',['Esquivar láseres','Usar un micrófono oculto','Desactivar una bomba','Perseguir a un villano','Escapar de una explosión','Disfrazarse']],
+  ['😱','Qué miedo',['Tener miedo','Ver una película de terror','Oír un ruido','Esconderse','Gritar','Mirar debajo de la cama']],
+  ['🧟‍♂️','Apocalipsis zombi',['Huir de zombis','Atrincherarse','Buscar comida','Ser mordido','Convertirse en zombi','Encontrar un refugio']],
+  ['🏝️','Náufrago',['Hacer fuego con palos','Pescar con lanza','Escribir SOS en la arena','Abrir un coco','Mensaje en una botella','Ver un barco a lo lejos']],
+  ['🏴‍☠️','Piratas',['Caminar por la tabla','Buscar un tesoro','Pata de palo','Loro en el hombro','Abordaje','Catalejo']],
+  ['🌵','Lejano Oeste',['Duelo al sol','Lanzar el lazo','Entrar en el saloon','Buscar oro','Asaltar una diligencia','Cartel de se busca']],
+  ['🏰','Castillo medieval',['Catapulta','Duelo de espadas','Arquero','Herrero','Banquete con las manos','Puente levadizo']],
+  ['👑','En palacio',['Rey','Reina','Príncipe','Princesa','Caballero','Bufón']],
+  ['🎩','Disfraces clásicos',['Mago','Payaso','Pirata','Ninja','Vaquero','Samurái']],
+
+  // --- Viajes y lugares ---
+  ['🛫','En el aeropuerto',['Pasar el control de seguridad','Hacer cola','Perder el vuelo','Arrastrar una maleta','Buscar la puerta de embarque','Dormir en la sala de espera']],
+  ['🧳','De vacaciones',['Hacer la maleta','Llegar al hotel','Perderse','Hacerse fotos','Comprar souvenirs','Olvidarse el pasaporte']],
+  ['🗺️','Viaje en coche',['Mirar el GPS','Equivocarse de salida','Parar en una gasolinera','Dormirse de copiloto','Discutir por la ruta','Cantar en el coche']],
+  ['🛳️','En un crucero',['Mirar por la borda','Tomar el sol','Marearse','Bailar en cubierta','Ver un espectáculo','Ver ballenas']],
+  ['🏖️','En la playa',['Echarse crema','Nadar','Hacer un castillo de arena','Tomar el sol','Jugar a las palas','Surfear']],
+  ['🏊','En la piscina',['Tirarse en bomba','Hacer el muerto','Bucear','Tirarse por el tobogán','Entrar en el agua fría','Quedarse sin aire']],
+  ['⛺','De acampada',['Montar la tienda','Encender fuego','Pescar','Asar malvaviscos','Ahuyentar mosquitos','Dormir en saco']],
+  ['🐟','De pesca',['Lanzar la caña','Poner el cebo','Picar un pez','Pescar una bota','Quedarse dormido esperando','Pez que se escapa']],
+  ['🏔️','Montaña',['Subir una cuesta','Bajar esquiando','Escalar','Hacer senderismo','Caerse en la nieve','Llegar a la cima']],
+  ['❄️','Invierno',['Muñeco de nieve','Patinar sobre hielo','Tiritar de frío','Lanzar una bola de nieve','Esquiar','Resbalar en el hielo']],
+  ['🌴','Selva',['Colgarse de lianas','Serpiente gigante','Mosquitos','Descubrir un templo','Perderse','Cruzar un río']],
+  ['🏜️','Desierto',['Tener sed','Caminar sobre arena','Encontrar un oasis','Ver un espejismo','Montar en camello','Tormenta de arena']],
+  ['🚀','Espacio',['Flotar','Ser astronauta','Caminar por la Luna','Ver la Tierra','Ser abducido','Despegar en un cohete']],
+  ['🔴','En Marte',['Buscar vida','Conducir un rover','Ponerse un casco','Saltar con poca gravedad','Encontrar un alienígena','Plantar una bandera']],
+  ['🌍','Países',['España','Estados Unidos','Japón','Italia','Francia','México']],
+  ['🏙️','Ciudades del mundo',['París','Nueva York','Roma','Londres','Tokio','Venecia']],
+  ['🗽','Monumentos',['Torre Eiffel','Estatua de la Libertad','Torre de Pisa','Pirámides de Egipto','Gran Muralla China','Coliseo']],
+  ['⛈️','El tiempo',['Lluvia','Tormenta','Viento fuerte','Granizo','Calor sofocante','Niebla']],
+  ['🌋','Desastres naturales',['Terremoto','Tsunami','Volcán','Tornado','Inundación','Avalancha']],
+  ['✈️','Transportes',['Avión','Barco','Tren','Helicóptero','Moto','Bicicleta']],
+  ['🛹','Vehículos curiosos',['Monociclo','Patines','Zancos','Trineo','Tándem','Kayak']],
+
+  // --- Historia ---
+  ['🏛️','Personajes históricos',['Albert Einstein','Cleopatra','Julio César','Leonardo da Vinci','Napoleón','Mozart']],
+  ['🎓','Más personajes históricos',['Cristóbal Colón','Gandhi','Isaac Newton','Frida Kahlo','Marie Curie','Charles Chaplin']],
+  ['⏳','Épocas',['Prehistoria','Antiguo Egipto','Imperio Romano','Edad Media','Lejano Oeste','El futuro']],
+  ['⚔️','Viaje en el tiempo',['Vikingos','Pirámides','Gladiadores','Caballeros','Vaqueros','Astronautas']],
+  ['🗿','Máquina del tiempo',['Edad de Piedra','Egipcios','Romanos','Piratas','Samuráis','Futuristas']],
+  ['📜','Momentos históricos',['Revolución Francesa','Llegada a la Luna','Descubrimiento de América','Caída del Imperio Romano','Construcción de las pirámides','Invención de Internet']],
+
+  // --- Animales ---
+  ['🦁','Animales salvajes',['León','Elefante','Mono','Serpiente','Pingüino','Canguro']],
+  ['🐯','Animales de la jungla',['Gorila','Tigre','Cocodrilo','Jirafa','Cebra','Hipopótamo']],
+  ['🐙','Animales marinos',['Tiburón','Delfín','Pulpo','Ballena','Medusa','Cangrejo']],
+  ['🐄','Granja',['Vaca','Cerdo','Gallina','Oveja','Cabra','Caballo']],
+  ['🦅','Aves',['Águila','Búho','Pingüino','Flamenco','Pavo real','Gallo']],
+  ['🐶','Mascotas',['Perro','Gato','Loro','Hámster','Pez','Tortuga']],
+  ['🐰','Mascotas pequeñas',['Conejo','Canario','Cobaya','Hurón','Iguana','Pez de colores']],
+  ['🦥','Animales raros',['Ornitorrinco','Perezoso','Camaleón','Avestruz','Koala','Mofeta']],
+  ['🐸','Imitar animales',['Mono','Gallina','Pato','Gusano','Rana','Foca']],
+  ['🐝','Bichitos',['Mosca','Mosquito','Araña','Abeja','Hormiga','Mariposa']],
+  ['🪳','Bichos asquerosos',['Cucaracha','Rata','Babosa','Gusano','Sanguijuela','Piojo']],
+  ['🦖','Dinosaurios',['Tiranosaurio','Triceratops','Velociraptor','Pterodáctilo','Diplodocus','Estegosaurio']],
+
+  // --- Deportes ---
+  ['⚽','Deportes',['Fútbol','Baloncesto','Tenis','Natación','Ciclismo','Boxeo']],
+  ['🏅','Juegos Olímpicos',['Salto de altura','Gimnasia rítmica','Halterofilia','Tiro con arco','Remo','Carrera de vallas']],
+  ['🥌','Deportes raros',['Curling','Esgrima','Sumo','Golf','Equitación','Lanzamiento de jabalina']],
+  ['🥅','Momentos de fútbol',['Marcar un gol','Celebrar un gol','Fingir una falta','Sacar tarjeta roja','Tirar un penalti','Hacer la ola']],
+  ['🪂','Deportes de aventura',['Paracaidismo','Puenting','Rafting','Parapente','Buceo','Tirolina']],
+  ['🏋️','En el gimnasio',['Levantar pesas','Correr en la cinta','Hacer abdominales','Hacer flexiones','Hacer yoga','Mirarse al espejo']],
+
+  // --- Ficción, cine y tele ---
+  ['🎮','Videojuegos',['Mario Bros','Minecraft','Pac-Man','Fortnite','Tetris','Pokémon']],
+  ['📺','Series',['Los Simpson','Stranger Things','Juego de Tronos','La Casa de Papel','Breaking Bad','Bob Esponja']],
+  ['📡','Programas de tele',['MasterChef','Operación Triunfo','Gran Hermano','Pasapalabra','Telediario','Hombre del tiempo']],
+  ['🎬','Películas',['Titanic','Jurassic Park','Star Wars','Tiburón','Matrix','Rocky']],
+  ['🧸','Pelis de animación',['Toy Story','Shrek','Frozen','Buscando a Nemo','Up','El Rey León']],
+  ['🤠','Sagas de aventuras',['Indiana Jones','Piratas del Caribe','Regreso al Futuro','El Señor de los Anillos','Misión Imposible','Los Cazafantasmas']],
+  ['🍿','En el cine',['Comer palomitas','Mandar callar','Llorar con la peli','Dormirse','Asustarse','Reírse']],
+  ['🦇','Personajes de ficción',['Harry Potter','Batman','Darth Vader','Sherlock Holmes','Drácula','Spiderman']],
+  ['🦸','Superhéroes',['Superman','Hulk','Flash','Thor','Capitán América','Iron Man']],
+  ['⚡','Superpoderes',['Volar','Invisibilidad','Leer la mente','Superfuerza','Telequinesis','Visión de rayos X']],
+  ['🦹','Villanos',['Joker','Voldemort','Cruella de Vil','Capitán Garfio','La Bruja Malvada','Thanos']],
+  ['📖','Cuentos clásicos',['Caperucita Roja','Blancanieves','Pinocho','Los Tres Cerditos','Cenicienta','Peter Pan']],
+  ['🧚','Más cuentos',['El Gato con Botas','Alicia en el País de las Maravillas','Aladdín','Rapunzel','Hansel y Gretel','La Bella Durmiente']],
+  ['🐉','Criaturas fantásticas',['Dragón','Unicornio','Sirena','Zombi','Vampiro','Fantasma']],
+  ['🧛','Monstruos clásicos',['Frankenstein','Momia','Hombre lobo','Hombre invisible','Monstruo del lago Ness','King Kong']],
+  ['🤖','Ciencia ficción',['Robot','Teletransporte','Viaje en el tiempo','Clon','Cíborg','Rayo láser']],
+
+  // --- Cosas que... ---
+  ['📢','Cosas que hacen ruido',['Claxon','Alarma','Aspiradora','Taladro','Secador','Despertador']],
+  ['🪁','Cosas que vuelan',['Avión','Cometa','Avión de papel','Mosquito','Superhéroe','Globo aerostático']],
+  ['🍯','Cosas pegajosas',['Chicle','Miel','Caramelo','Cinta adhesiva','Pegamento','Mocos']],
+  ['💔','Cosas que se rompen',['Vaso','Móvil','Huevos','Globo','Corazón','Espejo']],
+  ['🦨','Cosas que huelen mal',['Calcetín sucio','Basura','Pedo','Pescado','Zapatilla','Huevo podrido']],
+  ['👻','Cosas que dan miedo',['Fantasma','Payaso','Araña','Cucaracha','Película de terror','Oscuridad']],
+
+  // --- Para reírse ---
+  ['😬','Situaciones incómodas',['Saludar a alguien que saludaba a otro','Un abrazo que no termina nunca','Esquivarse en la acera hacia el mismo lado','Que te pillen hablando solo','Despedirse y salir en la misma dirección','Quedarse sin tema de conversación']],
+  ['🫣','Momentos vergonzosos',['Papel higiénico pegado al zapato','Ir con la bragueta abierta','Un pedo en silencio','Cantar a gritos con cascos','Que se te rompa el pantalón al agacharte','Pisar una caca']],
+  ['🎞️','Escenas de película',['Beso bajo la lluvia','Despedirse desde el tren','Grito en la ducha','Correr hacia tu amor por la playa','Morir de forma muy dramática','Persecución por los tejados']],
+  ['🐢','A cámara lenta',['Recibir un balonazo en la cara','Estornudar','Ganar una carrera en la meta','Pelea de almohadas','Tirarse a la piscina','Caer de cara en una tarta']],
+  ['🎶','Canciones con baile',['Paquito el chocolatero','Los pajaritos','YMCA','Aserejé','Gangnam Style','Fiebre del sábado noche']],
+  ['🎟️','En un concierto',['Hacer pogo','Mechero en alto','Subirse a hombros','No ver nada detrás de uno muy alto','Grabarlo todo con el móvil','Perder a tus amigos']],
+  ['🐈','Cosas de gatos',['Tirar cosas de la mesa','Meterse en una caja','Echar una bola de pelo','Asustarse de un pepino','Amasar con las patas','Caer siempre de pie']],
+  ['🐕‍🦺','Cosas de perros',['Perseguirse la cola','Sacar la cabeza por la ventanilla','Ladrar al cartero','Rascarse con la pata de atrás','Esconderse para no ir al veterinario','Recibir a su dueño como si llevara años sin verlo']],
+  ['🎤','Cantantes con estilo',['Shakira','Raphael','Freddie Mercury','Michael Jackson','Rosalía','Elvis Presley']],
+  ['🧑‍🔧','Trabajos raros',['Probador de colchones','Paseador de diez perros','Catador de vinos','Limpiacristales de rascacielos','Domador de pulgas','Empujador del metro de Tokio']],
+  ['🐣','Saliendo de...',['Un pollito del huevo','Una mariposa del capullo','Un saco de dormir','Un coche muy pequeño','La piscina sin escalera','Una tarta de cumpleaños']],
+  ['🤢','¡Puaj!',['Leche caducada','Café con sal','Zumo después de lavarte los dientes','Encontrar un pelo en la sopa','Comer pienso de perro sin querer','Morder una guindilla']],
+  ['🪞','Postureo',['Foto con morritos','Selfie desde arriba','Sujetar la Torre de Pisa','Hacer yoga para Instagram','Foto a la comida antes de comer','Fingir que no sabes que te hacen una foto']],
+  ['🦕','Brazos de T-Rex',['Hacerse la cama','Aplaudir','Peinarse','Hacer flexiones','Atarse los zapatos','Dar un abrazo']],
+  ['😣','Aguantar lo inaguantable',['Ganas de ir al baño en un atasco','Contener un estornudo','Aguantar la risa en un sitio serio','Un picor donde no llegas','La pierna dormida','Llevar una sopa demasiado llena']],
+  ['🚶','Formas de andar',['Descalzo sobre piedras','Por arena ardiendo','Con agujetas','De puntillas a escondidas','Por una pasarela de moda','Con chanclas mojadas']],
+];
+
+/* =========================================================
+   CONFIGURACIÓN
+   ========================================================= */
+const DURATION = 30; // segundos por ronda
+const PALETTE = ['#ff5d73','#ffc145','#3ddc97','#4cc9f0','#b388ff','#ff8a3d','#f472b6','#a3e635'];
+
+const DECK = RAW.map(([emoji, title, words], i) => ({
+  id: i, emoji, title, words, color: PALETTE[i % PALETTE.length]
+}));
+
+const $ = (s) => document.querySelector(s);
+const screens = { select: $('#screen-select'), play: $('#screen-play') };
+
+let round = 1;
+/* Cartas ya jugadas hoy. Solo cuenta como jugada la carta elegida cuando se
+   pone en marcha el tiempo; las que salen y no se eligen pueden volver a salir.
+   Se recuerda aunque se cierre la app y se vacía cada día a las 5:00. */
+const USED_KEY = 'deck:gestrudis';
+let usedDay = G.gameDay();
+let used = loadUsed();
+
+function loadUsed() {
+  const s = G.store.get(USED_KEY, null);
+  const ok = s && s.day === usedDay && Array.isArray(s.used);
+  return new Set(ok ? s.used.filter((id) => id < DECK.length) : []);
+}
+function saveUsed() { G.store.set(USED_KEY, { day: usedDay, used: [...used] }); }
+function checkDay() {
+  if (usedDay !== G.gameDay()) { usedDay = G.gameDay(); used.clear(); saveUsed(); }
+}
+function markUsed(card) {
+  if (!card || used.has(card.id)) return;
+  checkDay();
+  used.add(card.id);
+  saveUsed();
+}
+
+let currentFour = [];     // las 4 cartas en la mesa
+let current = null;       // carta elegida
+
+/* =========================================================
+   UTILIDADES
+   ========================================================= */
+function shuffle(array) {
+  const a = [...array];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function show(name) {
+  Object.entries(screens).forEach(([k, el]) => el.classList.toggle('active', k === name));
+  window.scrollTo(0, 0);
+}
+
+function fillList(ol, words) {
+  ol.innerHTML = '';
+  words.forEach((w, i) => {
+    const li = document.createElement('li');
+    const n = document.createElement('span');
+    n.className = 'num';
+    n.textContent = i + 1;
+    const t = document.createElement('span');
+    t.textContent = w;
+    li.append(n, t);
+    ol.appendChild(li);
+  });
+}
+
+/* =========================================================
+   SELECCIÓN DE CARTAS
+   ========================================================= */
+function drawFour() {
+  checkDay();
+  const onTable = new Set(currentFour.map(c => c.id));
+  let pool = DECK.filter(c => !used.has(c.id) && !onTable.has(c.id));
+  if (pool.length < 4) {            // mazo agotado: se vuelve a barajar
+    used.clear();
+    saveUsed();
+    pool = DECK.filter(c => !onTable.has(c.id));
+  }
+  currentFour = shuffle(pool).slice(0, 4);
+}
+
+function renderSelection() {
+  const grid = $('#grid');
+  grid.innerHTML = '';
+  currentFour.forEach((card, i) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'pick';
+    b.style.setProperty('--c', card.color);
+    b.style.animationDelay = (i * 60) + 'ms';
+
+    const head = document.createElement('div');
+    head.className = 'head';
+    const em = document.createElement('span');
+    em.className = 'emoji';
+    em.textContent = card.emoji;
+    const title = document.createElement('span');
+    title.className = 'title';
+    title.textContent = card.title;
+    head.append(em, title);
+
+    const ol = document.createElement('ol');
+    ol.className = 'pick-list';
+    fillList(ol, card.words);
+
+    b.append(head, ol);
+    b.addEventListener('click', () => selectCard(card));
+    grid.appendChild(b);
+  });
+
+  $('#round-pill').textContent = `Ronda ${round}`;
+  const left = DECK.length - used.size;
+  $('#deck-info').textContent = `${DECK.length} cartas en el mazo · ${left} sin jugar hoy`;
+}
+
+function goToSelection(newCards) {
+  resetTimer(false);
+  releaseWakeLock();
+  if (newCards || currentFour.length === 0) drawFour();
+  renderSelection();
+  show('select');
+}
+
+function selectCard(card) {
+  unlockAudio();
+  current = card;
+  const big = $('#big-card');
+  big.style.setProperty('--c', card.color);
+  big.style.animation = 'none'; big.offsetHeight; big.style.animation = '';
+  $('#big-emoji').textContent = card.emoji;
+  $('#big-title').textContent = card.title;
+  fillList($('#big-list'), card.words);
+  $('#round-label').textContent = `Ronda ${round}`;
+  resetTimer();
+  show('play');
+  requestWakeLock();
+}
+
+function nextRound() {
+  markUsed(current);
+  current = null;
+  round++;
+  goToSelection(true);
+}
+
+/* =========================================================
+   TEMPORIZADOR
+   ========================================================= */
+const CIRC = 2 * Math.PI * 54;
+const prog = $('#prog');
+prog.style.strokeDasharray = CIRC;
+
+let tState = 'idle';               // idle | running | paused | done
+let remainingMs = DURATION * 1000;
+let endAt = 0;
+let rafId = null;
+let lastSec = DURATION;
+
+function drawTimer() {
+  const sec = Math.ceil(remainingMs / 1000);
+  const ring = $('#ring');
+  prog.style.strokeDashoffset = tState === 'done' ? 0 : CIRC * (1 - remainingMs / (DURATION * 1000));
+  const active = tState === 'running' || tState === 'paused';
+  ring.classList.toggle('warn', active && sec <= 10 && sec > 5);
+  ring.classList.toggle('danger', active && sec <= 5);
+  ring.classList.toggle('done', tState === 'done');
+  $('#timer').textContent = tState === 'done' ? '¡Tiempo!' : sec;
+  $('#timer-sub').textContent =
+    tState === 'paused' ? 'en pausa' :
+    tState === 'idle'   ? 'segundos' :
+    tState === 'done'   ? '' : 'segundos';
+}
+
+function tick() {
+  remainingMs = Math.max(0, endAt - performance.now());
+  const sec = Math.ceil(remainingMs / 1000);
+  if (sec !== lastSec) {
+    if (sec <= 5 && sec > 0) tone(880, 0.12, 'sine', 0.25);
+    lastSec = sec;
+  }
+  if (remainingMs <= 0) { finishTimer(); return; }
+  drawTimer();
+  rafId = requestAnimationFrame(tick);
+}
+
+function startTimer() {
+  if (tState === 'running' || tState === 'done') return;
+  unlockAudio();
+  if (tState === 'idle') tone(660, 0.12, 'sine', 0.2);
+  markUsed(current);
+  tState = 'running';
+  endAt = performance.now() + remainingMs;
+  lastSec = Math.ceil(remainingMs / 1000);
+  requestWakeLock();
+  renderControls();
+  rafId = requestAnimationFrame(tick);
+}
+
+function pauseTimer() {
+  if (tState !== 'running') return;
+  cancelAnimationFrame(rafId);
+  remainingMs = Math.max(0, endAt - performance.now());
+  tState = 'paused';
+  drawTimer();
+  renderControls();
+}
+
+function resetTimer(render = true) {
+  cancelAnimationFrame(rafId);
+  tState = 'idle';
+  remainingMs = DURATION * 1000;
+  lastSec = DURATION;
+  drawTimer();
+  if (render) renderControls();
+}
+
+function finishTimer() {
+  cancelAnimationFrame(rafId);
+  remainingMs = 0;
+  tState = 'done';
+  drawTimer();
+  renderControls();
+  // Alarma final
+  tone(523, 0.18, 'square', 0.12, 0);
+  tone(523, 0.18, 'square', 0.12, 0.22);
+  tone(392, 0.55, 'square', 0.12, 0.44);
+  try { navigator.vibrate && navigator.vibrate([250, 120, 250, 120, 400]); } catch (e) {}
+  const sc = screens.play;
+  sc.classList.remove('flash'); void sc.offsetWidth; sc.classList.add('flash');
+}
+
+function renderControls() {
+  const c = $('#controls');
+  c.innerHTML = '';
+  const add = (label, cls, fn) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'btn ' + cls;
+    b.textContent = label;
+    b.addEventListener('click', fn);
+    c.appendChild(b);
+  };
+  if (tState === 'idle') {
+    add('▶  Empezar', 'primary', startTimer);
+  } else if (tState === 'running') {
+    add('⏸  Pausa', 'grow', pauseTimer);
+    add('↺', '', () => resetTimer());
+  } else if (tState === 'paused') {
+    add('▶  Seguir', 'primary grow', startTimer);
+    add('↺', '', () => resetTimer());
+  } else {
+    add('↺  Repetir', '', () => resetTimer());
+    add('Siguiente ronda  →', 'next grow', nextRound);
+  }
+  $('#btn-back').style.visibility = tState === 'running' ? 'hidden' : 'visible';
+}
+
+// Tocar el círculo también empieza / pausa
+$('#ring').addEventListener('click', () => {
+  if (tState === 'idle' || tState === 'paused') startTimer();
+  else if (tState === 'running') pauseTimer();
+});
+
+// Teclado: espacio = empezar/pausa, Enter = siguiente ronda al acabar
+document.addEventListener('keydown', (e) => {
+  if (!screens.play.classList.contains('active')) return;
+  if (e.code === 'Space') {
+    e.preventDefault();
+    if (tState === 'running') pauseTimer(); else if (tState !== 'done') startTimer();
+  } else if (e.code === 'Enter' && tState === 'done') {
+    e.preventDefault(); nextRound();
+  }
+});
+
+/* =========================================================
+   SONIDO (sin archivos, generado con Web Audio)
+   ========================================================= */
+let actx = null;
+let soundOn = true;
+try { soundOn = localStorage.getItem('gestrudis-sound') !== 'off'; } catch (e) {}
+
+function unlockAudio() {
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    if (actx.state === 'suspended') actx.resume();
+  } catch (e) { actx = null; }
+}
+
+function tone(freq, dur, type = 'sine', vol = 0.2, when = 0) {
+  if (!soundOn || !actx) return;
+  const t = actx.currentTime + when;
+  const o = actx.createOscillator();
+  const g = actx.createGain();
+  o.type = type;
+  o.frequency.value = freq;
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(vol, t + 0.01);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g).connect(actx.destination);
+  o.start(t);
+  o.stop(t + dur + 0.03);
+}
+
+function renderSoundBtn() {
+  $('#btn-sound').textContent = soundOn ? '🔊' : '🔇';
+}
+$('#btn-sound').addEventListener('click', () => {
+  soundOn = !soundOn;
+  try { localStorage.setItem('gestrudis-sound', soundOn ? 'on' : 'off'); } catch (e) {}
+  renderSoundBtn();
+  if (soundOn) { unlockAudio(); tone(660, 0.1); }
+});
+
+/* =========================================================
+   PANTALLA ENCENDIDA durante la partida
+   ========================================================= */
+let wakeLock = null;
+async function requestWakeLock() {
+  try {
+    if ('wakeLock' in navigator && !wakeLock) {
+      wakeLock = await navigator.wakeLock.request('screen');
+      wakeLock.addEventListener('release', () => { wakeLock = null; });
+    }
+  } catch (e) { wakeLock = null; }
+}
+function releaseWakeLock() {
+  try { wakeLock && wakeLock.release(); } catch (e) {}
+  wakeLock = null;
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && screens.play.classList.contains('active')) requestWakeLock();
+});
+
+/* =========================================================
+   BOTONES Y ARRANQUE
+   ========================================================= */
+$('#btn-shuffle').addEventListener('click', () => goToSelection(true));
+$('#btn-back').addEventListener('click', () => goToSelection(false));
+
+renderSoundBtn();
+goToSelection(true);
+</script>
+</body>
+</html>

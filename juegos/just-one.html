@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#17181b">
+    <title>Just One</title>
+    <link rel="stylesheet" href="../shared/estilo.css">
+</head>
+<body>
+
+    <!-- MENÚ -->
+    <div id="screen-menu" class="screen menu active">
+        <a class="home-link" href="../index.html">← Juegos</a>
+        <header class="menu-head">
+            <h1>Just One</h1>
+            <p>Una palabra secreta y una pista por persona. Las pistas repetidas se eliminan.</p>
+        </header>
+        <div class="field">
+            <span class="field-label">Espera para poder pasar</span>
+            <select id="cooldownSelect" data-seg aria-label="Espera para poder pasar">
+                <option value="0">No</option>
+                <option value="3">3 s</option>
+                <option value="5" selected>5 s</option>
+                <option value="10">10 s</option>
+            </select>
+        </div>
+        <div class="field">
+            <span class="field-label">Puntuación</span>
+            <select id="pointsSelect" data-seg aria-label="Puntuación">
+                <option value="off" selected>Sin puntos</option>
+                <option value="on">Contar aciertos</option>
+            </select>
+        </div>
+        <button class="btn-main" id="btnStart">Empezar</button>
+        <p class="hint" id="deckInfo"></p>
+    </div>
+
+    <!-- JUEGO -->
+    <div id="screen-game" class="screen">
+        <div class="bar">
+            <button class="small-btn" id="btnMenu">← Menú</button>
+            <span class="stat" id="remaining">Quedan --</span>
+            <span class="stat" id="score-wrap"><span id="score-board">0</span> pts</span>
+        </div>
+        <div class="prog"><i id="deckBar"></i></div>
+        <p class="turn-label">Enséñalo a todos menos a quien adivina</p>
+
+        <div class="card" id="card">
+            <div class="card-inner" id="word-view">
+                <div class="kicker">Palabra secreta</div>
+                <div class="word" id="palabra">Just One</div>
+                <div class="note">Una pista por persona. Las repetidas se eliminan.</div>
+            </div>
+            <div class="card-inner" id="end-view" hidden>
+                <div class="word">Fin</div>
+                <p class="note">Habéis visto todas las palabras del mazo.</p>
+                <button class="btn-main" id="btnReshuffle">Barajar de nuevo</button>
+            </div>
+        </div>
+
+        <div class="controls" id="controls">
+            <button class="btn btn-pass" id="btnFail">Pasar / Fallo<small>siguiente</small></button>
+            <button class="btn btn-success" id="btnHit">Acierto<small>siguiente</small></button>
+        </div>
+    </div>
+
+    <script src="../shared/common.js"></script>
+    <script>
+        const listaCompleta = [
+            // --- Originales ---
+            "Banco", "Carta", "Sirena", "Planta", "Muñeca", "Copa", "Ratón", "Batería", "Mono", "Taco", 
+            "Mango", "Cura", "Radio", "Cometa", "Bolsa", "Canguro", "Estrella", "Fuente", "Vela", "Gafas", 
+            "Cama", "Llave", "Zapato", "Paraguas", "Espejo", "Tijeras", "Reloj", "Anillo", "Sombrero", "Pantalón", 
+            "Camisa", "Calcetín", "Maleta", "Cartera", "Móvil", "Televisión", "Silla", "Mesa", "Puerta", "Ventana", 
+            "Plátano", "Pizza", "Huevo", "Chocolate", "Sol", "Nube", "Rosa", "Vaca", "Perro", "Elefante", 
+            "León", "Tigre", "Tiburón", "Pez", "Pájaro", "Árbol", "Flor", "Montaña", "Mar", "Río", 
+            "Fuego", "Nieve", "Lluvia", "Pirata", "Payaso", "Fantasma", "Vampiro", "Médico", "Bombero", "Policía", 
+            "Profesor", "Bruja", "Zombi", "Rey", "Reina", "Bebé", "Abuelo", "Martillo", "Cuchillo", "Tenedor", 
+            "Plato", "Vaso", "Botella", "Lápiz", "Papel", "Libro", "Globo", "Pelota", "Guitarra", "Piano", 
+            "Coche", "Bicicleta", "Avión", "Barco", "Tren", "Amor", "Boda", "Fiesta", "Navidad", "Verano",
+            
+            // --- Nuevas (Lugares, Famosos, Cine, Comida, Variedad) ---
+            "París", "Egipto", "Londres", "China", "Hospital", "Cárcel", "Biblioteca", "Cine", "Playa", "Desierto",
+            "Selva", "Granja", "Castillo", "Escuela", "Circo", "Museo", "Hotel", "Aeropuerto", "Cocina", "Baño",
+            "Estadio", "Supermercado", "Iglesia", "Cementerio", "Zoológico", "Piscina", "Batman", "Superman", "Spiderman", "Pikachu",
+            "Mario", "Barbie", "Tarzán", "Sherlock", "Drácula", "Frankenstein", "Messi", "Shakira", "Einstein", "Picasso",
+            "Papa", "Ninja", "Samurái", "Vikingo", "Mimo", "Alien", "Robot", "Ciborg", "Hulk", "Thor",
+            "Yoda", "Minion", "Titanic", "Matrix", "Shrek", "Avatar", "Simpson", "Friends", "Disney", "Netflix",
+            "Youtube", "Instagram", "Google", "Wifi", "Internet", "Tetris", "Poker", "Ajedrez", "Fútbol", "Tenis",
+            "Baloncesto", "Golf", "Óscar", "Hollywood", "Emoji", "Sushi", "Hamburguesa", "Paella", "Espagueti", "Ensalada",
+            "Sopa", "Helado", "Pastel", "Galleta", "Caramelo", "Palomitas", "Cerveza", "Vino", "Leche", "Café",
+            "Té", "Zumo", "Miel", "Sal", "Azúcar", "Kétchup", "Dinosaurio", "Dragón", "Unicornio", "Pingüino",
+            "Jirafa", "Oso", "Lobo", "Águila", "Serpiente", "Rana", "Mosquito", "Abeja", "Araña", "Volcán",
+            "Tornado", "Arcoíris", "Luna", "Universo", "Planeta", "Isla", "Dinero", "Lotería", "Trabajo", "Vacaciones",
+            "Regalo", "Beso", "Abrazo", "Música", "Baile", "Foto", "Cámara", "Micrófono", "Auriculares", "Ordenador",
+            "Teclado", "Pantalla", "Toalla", "Jabón", "Champú", "Perfume", "Maquillaje", "Cepillo", "Diente", "Lengua",
+            "Ojo", "Mano", "Pie", "Corazón", "Cerebro", "Esqueleto", "Momia", "Estatua", "Cuadro", "Basura",
+            "Mapa", "Bandera", "Semáforo", "Puente", "Ascensor"
+        ];
+
+        const $ = (id) => document.getElementById(id);
+        const mazo = new G.Deck('just-one', listaCompleta);
+        const cooldown = new G.Cooldown([$("btnFail")]);
+        let puntuacion = 0;
+        let ajustes = G.store.get('settings:just-one', { cooldown: 5, points: 'off' });
+
+        $("cooldownSelect").value = ajustes.cooldown;
+        $("pointsSelect").value = ajustes.points;
+        $("deckInfo").innerText = `${mazo.total} palabras · ${mazo.remaining} sin salir`;
+        G.segmented();
+
+        function mostrar(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            $(id).classList.add('active');
+        }
+
+        function empezar() {
+            ajustes = {
+                cooldown: parseInt($("cooldownSelect").value, 10),
+                points: $("pointsSelect").value
+            };
+            G.store.set('settings:just-one', ajustes);
+            puntuacion = 0;
+            $("score-board").innerText = "0";
+            $("score-wrap").style.visibility = ajustes.points === 'on' ? 'visible' : 'hidden';
+            mostrar('screen-game');
+            G.keepAwake(true);
+            siguientePalabra();
+        }
+
+        function volverAlMenu() {
+            if (ajustes.points === 'on' && puntuacion > 0 &&
+                !confirm(`Lleváis ${puntuacion} puntos. ¿Volver al menú?`)) return;
+            cooldown.stop();
+            G.keepAwake(false);
+            $("deckInfo").innerText = `${mazo.total} palabras · ${mazo.remaining} sin salir`;
+            mostrar('screen-menu');
+        }
+
+        let cambiando = false; // evita dobles toques durante la animación
+
+        function gestionarTurno(acierto) {
+            if (cambiando) return;
+            cambiando = true;
+            // Actualizar puntuación si acertó
+            if (acierto) {
+                puntuacion++;
+                $("score-board").innerText = puntuacion;
+            }
+
+            // Animación suave de cambio
+            const card = $("card");
+            card.style.opacity = "0.3";
+            card.style.transform = "scale(0.98)";
+
+            setTimeout(() => {
+                siguientePalabra();
+                card.style.opacity = "";
+                card.style.transform = "";
+                cambiando = false;
+            }, 150);
+        }
+
+        function siguientePalabra() {
+            const fin = mazo.remaining === 0;
+            $("word-view").hidden = fin;
+            $("end-view").hidden = !fin;
+            $("controls").style.visibility = fin ? 'hidden' : 'visible';
+            if (fin) {
+                cooldown.stop();
+                $("remaining").innerText = "Quedan 0";
+                $("deckBar").style.setProperty('--p', 0);
+                return;
+            }
+
+            $("palabra").innerText = mazo.draw();
+            $("remaining").innerText = "Quedan " + mazo.remaining;
+            $("deckBar").style.setProperty('--p', mazo.remaining / mazo.total);
+            cooldown.start(ajustes.cooldown);
+        }
+
+        $("btnStart").addEventListener('click', empezar);
+        $("btnMenu").addEventListener('click', volverAlMenu);
+        $("btnFail").addEventListener('click', () => gestionarTurno(false));
+        $("btnHit").addEventListener('click', () => gestionarTurno(true));
+        $("btnReshuffle").addEventListener('click', () => { mazo.reset(); siguientePalabra(); });
+    </script>
+</body>
+</html>

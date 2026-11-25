@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#17181b">
+<meta name="description" content="Juegos de fiesta para jugar con amigos con un solo móvil.">
+<title>Juegos con amigos</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="stylesheet" href="shared/estilo.css">
+<style>
+/* Menú principal: mismo estilo "Noche" que los juegos (colores en shared/estilo.css) */
+body { height: auto; min-height: 100vh; min-height: 100dvh; overflow: auto; }
+main {
+  max-width: 520px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: max(32px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
+           max(24px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+}
+header h1 { margin: 0; font-size: 2.6rem; font-weight: 700; letter-spacing: -.03em; line-height: 1; }
+header p { margin-top: 8px; color: var(--muted); font-size: .95rem; }
+
+.games {
+  display: flex;
+  flex-direction: column;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.game {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  color: var(--ink);
+  text-decoration: none;
+  transition: background-color .12s ease;
+}
+.game + .game { border-top: 1px solid var(--line); }
+.game:active { background: var(--soft); }
+.game .emoji {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: var(--soft);
+  font-size: 22px;
+}
+.game div { flex: 1; min-width: 0; }
+.game h2 { margin: 0; font-size: 1.1rem; font-weight: 600; }
+.game p { margin-top: 2px; color: var(--muted); font-size: .9rem; line-height: 1.3; }
+.game::after { content: "›"; color: var(--muted); font-size: 1.5rem; line-height: 1; }
+
+.install {
+  display: none;
+  width: 100%;
+  min-height: 52px;
+  border-radius: var(--btn-radius);
+  background: var(--soft);
+  color: var(--ink);
+  font-size: 1rem;
+  font-weight: 600;
+}
+.install.show { display: block; }
+footer { text-align: center; color: var(--muted); font-size: .8rem; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Juegos</h1>
+    <p>Un móvil, un grupo y muchas risas.</p>
+  </header>
+
+  <!-- Para añadir un juego: copia un bloque <a>, cambia el enlace y el texto,
+       y añade su archivo a la lista PRECACHE de sw.js -->
+  <nav class="games">
+    <a class="game" href="juegos/gestrudis.html">
+      <span class="emoji">🎭</span>
+      <div><h2>Gestrudis</h2><p>Elige carta, reparte números del 1 al 6 y adivina en 30 segundos.</p></div>
+    </a>
+    <a class="game" href="juegos/tabu.html">
+      <span class="emoji">🚫</span>
+      <div><h2>Tabú</h2><p>Describe la palabra sin decir las prohibidas.</p></div>
+    </a>
+    <a class="game" href="juegos/sound-charades.html">
+      <span class="emoji">🔊</span>
+      <div><h2>Sound Charades</h2><p>Solo sonidos: sin hablar y sin usar los brazos.</p></div>
+    </a>
+    <a class="game" href="juegos/just-one.html">
+      <span class="emoji">☝️</span>
+      <div><h2>Just One</h2><p>Una pista por persona; las repetidas se eliminan.</p></div>
+    </a>
+    <a class="game" href="juegos/debates.html">
+      <span class="emoji">⚖️</span>
+      <div><h2>Dios en el Bar</h2><p>Debates polémicos: un lado a favor y otro en contra.</p></div>
+    </a>
+  </nav>
+
+  <button class="install" id="btnInstall">Instalar como app</button>
+  <footer>Funciona sin conexión una vez abierto. Las cartas se barajan de nuevo cada día a las 5:00.</footer>
+</main>
+
+<script>
+// Funcionamiento sin conexión e instalación como app
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+}
+
+let installPrompt = null;
+const btnInstall = document.getElementById('btnInstall');
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  installPrompt = e;
+  btnInstall.classList.add('show');
+});
+btnInstall.addEventListener('click', async () => {
+  if (!installPrompt) return;
+  installPrompt.prompt();
+  await installPrompt.userChoice;
+  installPrompt = null;
+  btnInstall.classList.remove('show');
+});
+window.addEventListener('appinstalled', () => btnInstall.classList.remove('show'));
+</script>
+</body>
+</html>

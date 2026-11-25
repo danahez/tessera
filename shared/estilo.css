@@ -1,0 +1,244 @@
+/* =========================================================
+   Estilo "Noche": diseño común de Tabú, Sound Charades y Just One.
+   Oscuro suave, colores apagados y fuentes del sistema
+   (no descarga nada, funciona sin conexión).
+   ========================================================= */
+:root {
+    --bg: #17181b;        /* fondo */
+    --card: #202126;      /* carta y paneles */
+    --line: #2b2c32;      /* bordes y pista de la barra de tiempo */
+    --soft: #26272c;      /* botones neutros y selectores */
+    --soft-2: #34353b;    /* opción elegida */
+    --ink: #ebebee;       /* texto */
+    --muted: #8c8d95;     /* texto secundario */
+    --bad: #ee9a90;       /* Tabú / prohibidas / poco tiempo */
+    --bad-bg: rgba(232, 120, 110, .13);
+    --ok: #8fd3a6;        /* Acierto */
+    --ok-bg: rgba(120, 200, 150, .13);
+    --pass: #bdbdc4;      /* Pasar */
+    --radius: 20px;
+    --btn-radius: 16px;
+    color-scheme: dark;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+[hidden] { display: none !important; }
+
+html { height: 100%; }
+body {
+    margin: 0;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.3;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: background-color .15s ease;
+}
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; border: 0; background: none; padding: 0; }
+button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+p { margin: 0; }
+
+/* ---------- Pantallas ---------- */
+.screen {
+    display: none;
+    flex-direction: column;
+    gap: 14px;
+    width: 100%;
+    max-width: 520px;
+    height: 100%;
+    margin: 0 auto;
+    padding: max(18px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
+             max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+}
+.screen.active { display: flex; }
+.screen.center { justify-content: center; }
+
+/* ---------- Menú de cada juego ---------- */
+.menu { gap: 18px; overflow-y: auto; }
+.home-link { align-self: flex-start; color: var(--muted); text-decoration: none; font-size: .95rem; padding: 6px 0; }
+.menu-head h1 { margin: 0; font-size: 2.6rem; font-weight: 700; letter-spacing: -.03em; line-height: 1; }
+.menu-head p { margin-top: 8px; color: var(--muted); font-size: .95rem; max-width: 32ch; }
+
+.field { display: flex; flex-direction: column; gap: 8px; }
+.field-label { font-size: .85rem; color: var(--muted); }
+
+/* Selector de opciones (lo crea G.segmented a partir de un <select data-seg>) */
+.seg {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    gap: 3px;
+    padding: 3px;
+    border-radius: 14px;
+    background: var(--soft);
+}
+.seg.col { grid-auto-flow: row; }
+.seg button {
+    min-height: 44px;
+    padding: 6px 8px;
+    border-radius: 11px;
+    font-size: .95rem;
+    font-weight: 500;
+    color: var(--muted);
+    line-height: 1.15;
+}
+.seg.col button { text-align: left; padding: 10px 14px; }
+.seg button.on { background: var(--soft-2); color: var(--ink); font-weight: 600; }
+
+.teams { display: flex; gap: 8px; }
+.teams input {
+    flex: 1;
+    min-width: 0;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    background: var(--card);
+    font-size: 1rem;
+    user-select: text;
+    -webkit-user-select: text;
+}
+
+.btn-main {
+    width: 100%;
+    min-height: 56px;
+    flex: none;
+    border-radius: var(--btn-radius);
+    background: var(--ink);
+    color: var(--bg);
+    font-size: 1.1rem;
+    font-weight: 600;
+    transition: transform .08s;
+}
+.btn-main:active { transform: scale(.98); }
+.menu .btn-main { margin-top: auto; }
+.hint { text-align: center; color: var(--muted); font-size: .85rem; }
+
+/* ---------- Preparados / resultado ---------- */
+.panel {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 24px 20px;
+    text-align: center;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+}
+.ready-title { font-size: 1.9rem; font-weight: 700; letter-spacing: -.02em; line-height: 1.15; }
+.ready-sub, .score-label { color: var(--muted); }
+.ready-sub:empty, .score-label:empty { display: none; }
+.score-big { font-size: 5rem; font-weight: 700; line-height: 1; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
+
+.board { display: flex; flex-direction: column; gap: 6px; }
+.board-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: var(--soft);
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+.board-row b { font-size: 1.4rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.board-row.current { box-shadow: inset 0 0 0 1.5px var(--muted); }
+.board-row.leader b { color: var(--ok); }
+
+.btn-link { width: 100%; padding: 10px; color: var(--muted); font-size: .95rem; }
+
+/* ---------- Pantalla de juego ---------- */
+.bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 44px; flex: none; }
+.icon-btn {
+    width: 44px;
+    height: 44px;
+    flex: none;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--soft);
+    color: var(--muted);
+    font-size: 1rem;
+}
+.small-btn { height: 40px; padding: 0 14px; border-radius: 999px; background: var(--soft); color: var(--muted); font-size: .9rem; flex: none; }
+.clock { font-size: 1.6rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.clock.low { color: var(--bad); }
+.stat { min-width: 44px; text-align: right; color: var(--muted); font-size: 1rem; font-variant-numeric: tabular-nums; }
+
+.prog { height: 4px; flex: none; border-radius: 4px; background: var(--line); overflow: hidden; }
+.prog i { display: block; height: 100%; width: calc(var(--p, 1) * 100%); background: var(--pass); border-radius: 4px; transition: width 1s linear; }
+
+.turn-label { text-align: center; color: var(--muted); font-size: .95rem; }
+.turn-label:empty { display: none; }
+
+.card {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 24px 20px;
+    text-align: center;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: transform .15s ease, opacity .15s ease;
+}
+.card-inner { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.kicker { font-size: .75rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.word {
+    font-size: clamp(2.2rem, 11vw, 3.2rem);
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -.02em;
+    overflow-wrap: anywhere;
+    text-wrap: balance;
+}
+.forbidden-title { margin-top: 18px; }
+.forbidden-list { display: flex; flex-direction: column; gap: 8px; }
+.forbidden-word { font-size: 1.35rem; font-weight: 500; color: var(--bad); }
+.note { color: var(--muted); font-size: 1rem; margin-top: 6px; max-width: 26ch; }
+
+.controls { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 10px; flex: none; }
+.btn {
+    position: relative;
+    min-height: 88px;
+    padding: 8px 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    border-radius: var(--btn-radius);
+    font-size: 1.15rem;
+    font-weight: 600;
+    line-height: 1.15;
+    transition: transform .08s, opacity .2s;
+}
+.btn small { font-size: .85rem; font-weight: 500; opacity: .8; font-variant-numeric: tabular-nums; }
+.btn:active { transform: scale(.97); }
+.btn-fail { background: var(--bad-bg); color: var(--bad); }
+.btn-pass { background: var(--soft); color: var(--pass); }
+.btn-success { background: var(--ok-bg); color: var(--ok); }
+
+/* Espera para pasar: G.Cooldown añade .cooling y data-cd al botón */
+.cooling { opacity: .42; cursor: not-allowed; }
+.cooling:active { transform: none; }
+.cooling small { display: none; }
+.cooling::after {
+    content: "espera " attr(data-cd) " s";
+    font-size: .85rem;
+    font-weight: 500;
+    opacity: .8;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body, .card, .btn, .btn-main, .prog i { transition: none; }
+}

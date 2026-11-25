@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#000000">
+    <title>Dios, el Bar y el Debate</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #f1f1f1;
+            --gold: #f39c12;
+            --favor-color: #2ecc71;
+            --contra-color: #e74c3c;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+        }
+
+        header {
+            position: relative;
+            text-align: center;
+            padding: 20px 10px;
+            background-color: #000;
+            border-bottom: 2px solid var(--gold);
+        }
+
+        header h1 {
+            color: var(--gold);
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .home-link {
+            position: absolute;
+            left: 10px;
+            top: 10px;
+            color: #aaa;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: bold;
+            padding: 4px 10px;
+            border: 1px solid #444;
+            border-radius: 8px;
+        }
+
+        header p {
+            font-size: 0.85rem;
+            color: #aaa;
+            margin-top: 5px;
+        }
+
+        .main-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 20px;
+            gap: 30px;
+        }
+
+        .topic-container {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #333;
+        }
+
+        .topic-text {
+            font-size: 1.3rem;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .teams-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .team-box {
+            flex: 1;
+            padding: 25px 10px;
+            text-align: center;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .team-title {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.8);
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .status {
+            font-size: 1.4rem;
+        }
+
+        .favor {
+            background-color: var(--favor-color);
+            color: #fff;
+        }
+
+        .contra {
+            background-color: var(--contra-color);
+            color: #fff;
+        }
+
+        .neutral {
+            background-color: #444;
+            color: #aaa;
+        }
+
+        .controls {
+            padding: 20px;
+            padding-bottom: 40px;
+        }
+
+        .btn-next {
+            width: 100%;
+            padding: 18px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #000;
+            background-color: var(--gold);
+            border: none;
+            border-radius: 50px;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(243, 156, 18, 0.4);
+            transition: transform 0.1s, background-color 0.3s;
+        }
+
+        .btn-next:active {
+            transform: scale(0.96);
+            background-color: #d68910;
+        }
+
+        /* Animación de aparición */
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a class="home-link" href="../index.html">←</a>
+        <h1>Dios en el Bar</h1>
+        <p>Lee el debate en voz alta y mira quién lo defiende</p>
+    </header>
+
+    <div class="main-container">
+        <!-- Tema del debate -->
+        <div class="topic-container">
+            <p id="debate-topic" class="topic-text fade-in">
+                Presiona "Generar Debate" para comenzar. Las posturas se asignarán al azar a tu izquierda y a tu derecha.
+            </p>
+        </div>
+
+        <!-- Equipos Izquierda y Derecha -->
+        <div class="teams-container">
+            <div id="left-box" class="team-box neutral">
+                <span class="team-title">Equipo Izquierda</span>
+                <span id="left-status" class="status">?</span>
+            </div>
+            
+            <div id="right-box" class="team-box neutral">
+                <span class="team-title">Equipo Derecha</span>
+                <span id="right-status" class="status">?</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="btn-next" onclick="nextDebate()">Generar Debate</button>
+    </div>
+
+    <script src="../shared/common.js"></script>
+    <script>
+        // Base de datos de debates polémicos, morales, filosóficos y extremos
+        const debates =[
+            "¿Debería la inteligencia artificial tener los mismos derechos legales que un ser humano si alcanza la autoconciencia plena?",
+            "¿Está moralmente justificada la tortura si es la única forma comprobada de salvar la vida de miles de inocentes ante un ataque inminente?",
+            "¿Debería existir un límite legal absoluto de riqueza, de modo que toda fortuna superior a 100 millones de euros sea expropiada por el estado?",
+            "¿Es ético y aceptable usar la edición genética en embriones humanos para crear niños más inteligentes, fuertes y atractivos?",
+            "¿El sistema democrático está obsoleto y debería ser reemplazado por una tecnocracia liderada por algoritmos y los mejores expertos del mundo?",
+            "¿Debería ser obligatorio pasar un examen psicológico y de conocimientos básicos de economía/política antes de tener derecho a votar?",
+            "¿Debería legalizarse la compraventa voluntaria de órganos humanos para acabar con el mercado negro y salvar vidas en listas de espera?",
+            "¿Debería existir un 'carnet de padres' que exija a las parejas pasar pruebas psicológicas y económicas estrictas antes de permitirles tener un hijo?",
+            "¿Debería prohibirse completamente por ley el consumo de carne animal por razones éticas de sufrimiento y por el impacto medioambiental?",
+            "¿El estado debería tener derecho a espiar todas nuestras comunicaciones privadas si eso garantiza reducir los asesinatos y el terrorismo a casi cero?",
+            "¿Debería ser legal el suicidio asistido (eutanasia) para cualquier persona mayor de edad que simplemente ya no desee vivir, aunque esté sana?",
+            "Si pudiéramos conectarnos a una simulación tipo 'Matrix' donde la vida es perfecta y feliz, ¿debería la humanidad abandonar el mundo real que está lleno de sufrimiento?",
+            "¿Deberían perdonarse y legalizarse los robos y delitos menores de supervivencia cometidos por personas en situación de pobreza extrema?",
+            "¿Deberían las naciones más ricas del mundo abrir sus fronteras por completo y eliminar cualquier restricción a la inmigración mundial?",
+            "¿Se debería limitar por ley la cantidad de hijos (máximo 1 o 2) que puede tener una persona para frenar la superpoblación y el colapso climático?",
+            "¿Debería ser totalmente legal el uso y venta de cualquier droga o sustancia psicodélica si el consumidor es un adulto que asume los riesgos?",
+            "¿Es justificable el uso de la violencia armada o el terrorismo si es la única vía que le queda a un pueblo para derrocar a una dictadura opresiva?",
+            "¿Debería la sociedad dejar de investigar cómo curar el envejecimiento y aceptar la muerte como una necesidad vital para el equilibrio del planeta?",
+            "¿Debería abolirse la herencia patrimonial para que todo el mundo empiece literalmente desde cero y exista una meritocracia real?",
+            "¿El arte generado por Inteligencia Artificial tiene exactamente el mismo valor emocional y cultural que el arte creado por humanos?",
+            "¿Deberían los países occidentales estar obligados a pagar grandes indemnizaciones económicas anuales a las naciones que fueron sus colonias o de donde extrajeron esclavos?",
+            "¿La prostitución debería legalizarse y ser tratada como un trabajo convencional con sindicatos, en lugar de intentar abolirla por considerarla denigrante?",
+            "¿Debería implementarse una Renta Básica Universal para todos, incluso si eso significa que un gran porcentaje de la población decida no trabajar jamás?",
+            "¿Debería eliminarse el anonimato en internet y requerir un DNI para crear perfiles sociales, con el fin de acabar con el ciberacoso y las estafas?",
+            "¿Es ético probar medicamentos experimentales altamente peligrosos en asesinos en serie condenados a muerte, a cambio de perdonarles la vida?",
+            "¿Debería el gobierno poder obligar físicamente a las personas a vacunarse durante una pandemia letal para proteger a los inmunodeprimidos?",
+            "¿Debería permitirse legalmente la 'esclavitud voluntaria', es decir, que alguien venda 10 años de su libertad total a una empresa a cambio de saldar deudas millonarias?",
+            "¿Debería permitirse la clonación humana para que los padres puedan 'recuperar' a un niño que haya fallecido trágicamente?",
+            "¿Tener animales y mascotas de compañía debería prohibirse al considerarse una forma de secuestro de otra especie para el simple entretenimiento humano?",
+            "¿Debería desaparecer el dinero en efectivo para que el gobierno y los bancos puedan rastrear el 100% de las transacciones y erradicar así la economía sumergida?",
+            "¿Es moral usar tecnología neurológica para 'reprogramar' el cerebro de los violadores y asesinos, quitándoles su libre albedrío pero asegurando que no reincidan?",
+            "¿Deberían los adolescentes de 14 años tener pleno derecho legal para tomar decisiones médicas irreversibles sobre sus cuerpos sin el consentimiento de sus padres?",
+            "¿Si los humanos descubren que existe un Dios, pero es cruel o injusto, la humanidad tendría la obligación moral de rebelarse contra él en lugar de adorarlo?",
+            "¿La religión organizada, haciendo balance de toda la historia humana, ha causado más sufrimiento y retraso que consuelo y paz social?",
+            "¿Es justo que un sistema de justicia priorice el castigo y la venganza por encima de la rehabilitación del delincuente para dar paz a las víctimas?",
+            "¿Deberían las personas sin hijos pagar un impuesto adicional permanente por no estar aportando nueva mano de obra para el futuro de las pensiones?",
+            "¿Debería eliminarse el matrimonio como institución legal gestionada por el estado, pasando a ser un simple contrato privado sin beneficios fiscales?",
+            "¿Está justificado utilizar la experimentación animal si eso nos permite encontrar inmediatamente la cura contra el cáncer?",
+            "¿Es ético que las grandes empresas tecnológicas nos ofrezcan servicios 'gratuitos' a cambio de registrar, analizar y comerciar con toda nuestra vida privada?",
+            "¿Si pudieras presionar un botón para extinguir pacíficamente y sin dolor a toda la raza humana y así acabar con todo el sufrimiento del mundo, sería moral presionarlo?",
+            "¿Deberían las redes sociales estar obligadas a manipular sus algoritmos para promover contenido 'positivo' aunque eso implique censurar opiniones pesimistas o críticas?",
+            "¿Es legítimo que un país manipule la información o difunda propaganda si eso garantiza la estabilidad social y evita conflictos internos?",
+            "¿Debería prohibirse la educación privada para garantizar una igualdad real de oportunidades desde la infancia?",
+            "¿Es moralmente aceptable tener hijos en un mundo que enfrenta una crisis climática potencialmente irreversible?",
+            "¿Debería el estado poder decidir qué carreras universitarias tienen más plazas según las necesidades económicas del país?",
+            "¿Es ético que las empresas sustituyan trabajadores humanos por robots si eso aumenta drásticamente los beneficios?",
+            "¿Debería prohibirse la publicidad dirigida, incluso si eso reduce la eficiencia económica de muchas empresas?",
+            "¿Es justo que los deportistas trans compitan sin restricciones en categorías tradicionales según su identidad de género?",
+            "¿Deberían las plataformas de streaming eliminar contenido antiguo que hoy se considera ofensivo o inapropiado?",
+            "¿Es moralmente correcto consumir productos fabricados en países con condiciones laborales abusivas si no hay alternativas accesibles?",
+            "¿Debería penalizarse legalmente la difusión de teorías conspirativas aunque algunas puedan resultar ciertas?",
+            "¿Es ético que los padres controlen y monitoricen completamente la vida digital de sus hijos menores?",
+            "¿Debería limitarse el tiempo máximo diario que una persona puede pasar en videojuegos o redes sociales por ley?",
+            "¿Es justo que los países con más emisiones históricas tengan más responsabilidad en financiar soluciones climáticas?",
+            "¿Debería prohibirse la creación de deepfakes aunque tengan usos artísticos o humorísticos?",
+            "¿Es aceptable que una empresa despida a empleados basándose en predicciones algorítmicas de bajo rendimiento futuro?",
+            "¿Debería existir un límite legal de edad máxima para ejercer cargos políticos importantes?",
+            "¿Es moralmente correcto modificar genéticamente animales para que no sientan dolor y así facilitar su consumo?",
+            "¿Debería el estado intervenir directamente en la crianza de niños en entornos familiares considerados 'tóxicos' aunque no haya abuso explícito?",
+            "¿Es legítimo que una persona cambie radicalmente su identidad (nombre, historia, etc.) y empiece de cero sin dejar rastro legal?",
+            "¿Debería prohibirse el anonimato en donaciones políticas para evitar corrupción?",
+            "¿Es ético que los influencers promocionen productos sin conocer realmente su impacto o calidad?",
+            "¿Debería haber un límite global al turismo en ciudades saturadas aunque afecte gravemente a la economía local?",
+            "¿Es moralmente aceptable desarrollar armas autónomas que tomen decisiones sin intervención humana?",
+            "¿Debería penalizarse el consumo excesivo de recursos (agua, energía) a nivel individual?",
+            "¿Es justo que una inteligencia artificial pueda tomar decisiones judiciales si demuestra ser más imparcial que los humanos?",
+            "¿Debería prohibirse la reproducción de personas con enfermedades genéticas graves para evitar sufrimiento futuro?",
+            "¿Es ético usar datos personales de personas fallecidas para entrenar modelos de inteligencia artificial?",
+            "¿Debería el derecho a la privacidad desaparecer en favor de una transparencia total para prevenir delitos?",
+            "¿Es moralmente aceptable que los gobiernos manipulen la natalidad mediante incentivos o restricciones?",
+            "¿Debería permitirse la creación de 'realidades virtuales permanentes' donde las personas puedan vivir desconectadas del mundo físico?",
+            "¿Es justo que las empresas puedan patentar recursos naturales o genes humanos?",
+            "¿Debería eliminarse el concepto de propiedad privada en favor de un modelo completamente compartido?",
+            "¿Es ético modificar recuerdos humanos para eliminar traumas o mejorar la felicidad?",
+            "¿Debería ser ilegal rechazar tratamientos médicos gratuitos si eso pone en riesgo al sistema sanitario?",
+            "¿Es aceptable que una sociedad valore más la productividad económica que el bienestar emocional de sus ciudadanos?",
+            "¿Debería el arte tener límites legales cuando puede ofender profundamente a ciertos colectivos?",
+            "¿Es moralmente correcto desarrollar tecnologías que permitan 'leer la mente' aunque se regulen?",
+            "¿Debería exigirse un nivel mínimo de inteligencia o educación para ocupar ciertos trabajos básicos?",
+            "¿Es ético priorizar la vida de personas jóvenes sobre la de mayores en situaciones de recursos médicos limitados?"
+        ];
+
+        // Mazo que no repite debates hasta haberlos visto todos (se recuerda entre partidas)
+        const mazo = new G.Deck('debates', debates);
+
+        function nextDebate() {
+            const topicElement = document.getElementById('debate-topic');
+            const leftBox = document.getElementById('left-box');
+            const rightBox = document.getElementById('right-box');
+            const leftStatus = document.getElementById('left-status');
+            const rightStatus = document.getElementById('right-status');
+
+            // 1. Sacar el siguiente debate del mazo (no se repiten hasta agotarlo)
+            topicElement.innerText = mazo.draw();
+            G.keepAwake(true);
+
+            // Reiniciar animación del texto para que se sienta dinámico
+            topicElement.classList.remove('fade-in');
+            void topicElement.offsetWidth; // Forzar reflow
+            topicElement.classList.add('fade-in');
+
+            // 2. Asignar lados de manera totalmente aleatoria (50% de probabilidad para cada configuración)
+            const coinToss = Math.random() < 0.5;
+
+            // Al ser 100% aleatorio en cada clic, puede tocar "A Favor" a la derecha varias veces seguidas, como pediste.
+            if (coinToss) {
+                // Izquierda A FAVOR, Derecha EN CONTRA
+                leftStatus.innerText = "A FAVOR";
+                leftBox.className = "team-box favor fade-in";
+                
+                rightStatus.innerText = "EN CONTRA";
+                rightBox.className = "team-box contra fade-in";
+            } else {
+                // Izquierda EN CONTRA, Derecha A FAVOR
+                leftStatus.innerText = "EN CONTRA";
+                leftBox.className = "team-box contra fade-in";
+                
+                rightStatus.innerText = "A FAVOR";
+                rightBox.className = "team-box favor fade-in";
+            }
+        }
+    </script>
+</body>
+</html>
