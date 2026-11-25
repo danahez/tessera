@@ -11,14 +11,21 @@
 
     <!-- PANTALLA 1: MENÚ -->
     <div id="screen-menu" class="screen menu active">
-        <a class="home-link" href="../index.html">← Juegos</a>
+        <a class="home-link" href="../index.html" data-i18n="home">← Juegos</a>
         <header class="menu-head">
-            <h1>Tabú</h1>
-            <p>Describe la palabra sin decir ninguna de las cuatro prohibidas.</p>
+            <h1 data-i18n="title"></h1>
+            <p data-i18n="subtitle"></p>
         </header>
         <div class="field">
-            <span class="field-label">Tiempo de ronda</span>
-            <select id="timeSelect" data-seg aria-label="Tiempo de ronda">
+            <span class="field-label" data-i18n="lang">Idioma</span>
+            <select id="langSelect" data-seg aria-label="Idioma / Language">
+                <option value="es">Español</option>
+                <option value="en">English</option>
+            </select>
+        </div>
+        <div class="field">
+            <span class="field-label" data-i18n="time">Tiempo de ronda</span>
+            <select id="timeSelect" data-seg data-i18n-aria="time">
                 <option value="30">30 s</option>
                 <option value="60" selected>60 s</option>
                 <option value="90">90 s</option>
@@ -26,44 +33,44 @@
             </select>
         </div>
         <div class="field">
-            <span class="field-label">Espera para poder pasar</span>
-            <select id="cooldownSelect" data-seg aria-label="Espera para poder pasar">
-                <option value="0">No</option>
+            <span class="field-label" data-i18n="cooldown">Espera para poder pasar</span>
+            <select id="cooldownSelect" data-seg data-i18n-aria="cooldown">
+                <option value="0" data-i18n="no">No</option>
                 <option value="3">3 s</option>
                 <option value="5" selected>5 s</option>
                 <option value="10">10 s</option>
             </select>
         </div>
         <div class="field">
-            <span class="field-label">Modo de juego</span>
-            <select id="modeSelect" data-seg="col" aria-label="Modo de juego">
-                <option value="solo">Un grupo</option>
-                <option value="round">Dos equipos · puntos por turno</option>
-                <option value="total">Dos equipos · marcador total</option>
+            <span class="field-label" data-i18n="mode">Modo de juego</span>
+            <select id="modeSelect" data-seg="col" data-i18n-aria="mode">
+                <option value="solo" data-i18n="modeSolo">Un grupo</option>
+                <option value="round" data-i18n="modeRound">Dos equipos · puntos por turno</option>
+                <option value="total" data-i18n="modeTotal">Dos equipos · marcador total</option>
             </select>
         </div>
         <div id="teamsBox" class="teams" hidden>
-            <input id="teamA" maxlength="16" value="Equipo 1" aria-label="Nombre del equipo 1">
-            <input id="teamB" maxlength="16" value="Equipo 2" aria-label="Nombre del equipo 2">
+            <input id="teamA" maxlength="16" data-i18n-ph="team1" data-i18n-aria="team1">
+            <input id="teamB" maxlength="16" data-i18n-ph="team2" data-i18n-aria="team2">
         </div>
         <div id="roundsBox" class="field" hidden>
-            <span class="field-label">Rondas (cada equipo juega un turno por ronda)</span>
-            <select id="roundsSelect" data-seg aria-label="Rondas">
-                <option value="0">Sin límite</option>
+            <span class="field-label" data-i18n="rounds">Rondas (cada equipo juega un turno por ronda)</span>
+            <select id="roundsSelect" data-seg data-i18n-aria="rounds">
+                <option value="0" data-i18n="noLimit">Sin límite</option>
                 <option value="3">3</option>
                 <option value="5">5</option>
                 <option value="10">10</option>
             </select>
         </div>
         <div class="field">
-            <span class="field-label">Sonidos</span>
-            <select id="soundSelect" data-seg aria-label="Sonidos">
-                <option value="on">Activados</option>
-                <option value="off">Desactivados</option>
+            <span class="field-label" data-i18n="sounds">Sonidos</span>
+            <select id="soundSelect" data-seg data-i18n-aria="sounds">
+                <option value="on" data-i18n="on">Activados</option>
+                <option value="off" data-i18n="off">Desactivados</option>
             </select>
         </div>
-        <button class="btn-main" id="btnStart">Empezar</button>
-        <p class="hint">Acierto +1 · Tabú −1 · Pasar 0</p>
+        <button class="btn-main" id="btnStart" data-i18n="start">Empezar</button>
+        <p class="hint" data-i18n="hint"></p>
     </div>
 
     <!-- PANTALLA 2: PREPARADOS -->
@@ -72,15 +79,15 @@
             <p class="ready-title" id="readyTitle"></p>
             <p class="ready-sub" id="readySub"></p>
             <div class="board" id="readyBoard"></div>
-            <button class="btn-main" id="btnGo">Empezar turno</button>
-            <button class="btn-link" data-to-menu="confirm">Volver al menú</button>
+            <button class="btn-main" id="btnGo" data-i18n="startTurn">Empezar turno</button>
+            <button class="btn-link" data-to-menu="confirm" data-i18n="backMenu">Volver al menú</button>
         </div>
     </div>
 
     <!-- PANTALLA 3: JUEGO -->
     <div id="screen-game" class="screen">
         <div class="bar">
-            <button class="icon-btn" id="btnStop" aria-label="Terminar turno">✕</button>
+            <button class="icon-btn" id="btnStop" data-i18n-aria="stopTurn">✕</button>
             <span class="clock" id="timerDisplay">60 s</span>
             <span class="stat"><span id="scoreDisplay">0</span> pts</span>
         </div>
@@ -88,40 +95,40 @@
         <p class="turn-label" id="turnLabel"></p>
 
         <div class="card">
-            <div class="kicker">Describe</div>
-            <div class="word" id="wordTarget">Palabra</div>
-            <div class="kicker forbidden-title">No digas</div>
+            <div class="kicker" data-i18n="describe">Describe</div>
+            <div class="word" id="wordTarget"></div>
+            <div class="kicker forbidden-title" data-i18n="dontSay">No digas</div>
             <div class="forbidden-list" id="wordForbidden"></div>
         </div>
 
         <div class="controls">
-            <button class="btn btn-fail" data-points="-1" data-flash="#3a2427">Tabú<small>−1</small></button>
-            <button class="btn btn-pass" data-points="0" data-flash="#2a2b30" data-cooldown>Pasar<small>0</small></button>
-            <button class="btn btn-success" data-points="1" data-flash="#1f3328">Acierto<small>+1</small></button>
+            <button class="btn btn-fail" data-points="-1" data-flash="#3a2427"><span data-i18n="taboo">Tabú</span><small>−1</small></button>
+            <button class="btn btn-pass" data-points="0" data-flash="#2a2b30" data-cooldown><span data-i18n="pass">Pasar</span><small>0</small></button>
+            <button class="btn btn-success" data-points="1" data-flash="#1f3328"><span data-i18n="correct">Acierto</span><small>+1</small></button>
         </div>
     </div>
 
     <!-- PANTALLA 4: RESULTADO DEL TURNO -->
     <div id="screen-result" class="screen center">
         <div class="panel">
-            <p class="score-label">Fin del turno</p>
+            <p class="score-label" data-i18n="endOfTurn">Fin del turno</p>
             <p class="score-label" id="resultTitle"></p>
             <p class="score-big" id="finalScore">0</p>
-            <p class="score-label">puntos</p>
+            <p class="score-label" data-i18n="unit"></p>
             <div class="board" id="resultBoard"></div>
             <button class="btn-main" id="btnNext">Siguiente turno</button>
-            <button class="btn-link" id="btnEnd">Terminar partida</button>
-            <button class="btn-link" data-to-menu="confirm">Volver al menú</button>
+            <button class="btn-link" id="btnEnd" data-i18n="endGame">Terminar partida</button>
+            <button class="btn-link" data-to-menu="confirm" data-i18n="backMenu">Volver al menú</button>
         </div>
     </div>
 
     <!-- PANTALLA 5: RESULTADO FINAL -->
     <div id="screen-final" class="screen center">
         <div class="panel">
-            <p class="score-label">Resultado final</p>
+            <p class="score-label" data-i18n="finalResult">Resultado final</p>
             <p class="ready-title" id="finalTitle"></p>
             <div class="board" id="finalBoard"></div>
-            <button class="btn-main" data-to-menu>Nueva partida</button>
+            <button class="btn-main" data-to-menu data-i18n="newGame">Nueva partida</button>
         </div>
     </div>
 
@@ -419,14 +426,313 @@
             { t: "Zoom", f: ["Videollamada", "Reunión", "Cámara", "Pantalla"] }
         ];
 
+        // --- TEXTOS DE LA PANTALLA ---
+        G.T.es = {
+            title: 'Tabú', subtitle: 'Describe la palabra sin decir ninguna de las cuatro prohibidas.',
+            home: '← Juegos', lang: 'Idioma', time: 'Tiempo de ronda', cooldown: 'Espera para poder pasar', no: 'No',
+            mode: 'Modo de juego', modeSolo: 'Un grupo', modeRound: 'Dos equipos · puntos por turno', modeTotal: 'Dos equipos · marcador total',
+            rounds: 'Rondas (cada equipo juega un turno por ronda)', noLimit: 'Sin límite', sounds: 'Sonidos', on: 'Activados', off: 'Desactivados',
+            start: 'Empezar', hint: 'Acierto +1 · Tabú −1 · Pasar 0', startTurn: 'Empezar turno', backMenu: 'Volver al menú', stopTurn: 'Terminar turno',
+            describe: 'Describe', dontSay: 'No digas', taboo: 'Tabú', pass: 'Pasar', correct: 'Acierto',
+            endOfTurn: 'Fin del turno', unit: 'puntos', endGame: 'Terminar partida', finalResult: 'Resultado final', newGame: 'Nueva partida',
+            readyHint: 'Pásale el móvil a quien vaya a describir',
+        };
+        G.T.en = {
+            title: 'Taboo', subtitle: 'Describe the word without saying any of the four forbidden ones.',
+            home: '← Games', lang: 'Language', time: 'Round time', cooldown: 'Wait before passing', no: 'No',
+            mode: 'Game mode', modeSolo: 'One group', modeRound: 'Two teams · points per turn', modeTotal: 'Two teams · running score',
+            rounds: 'Rounds (each team plays one turn per round)', noLimit: 'No limit', sounds: 'Sounds', on: 'On', off: 'Off',
+            start: 'Start', hint: 'Correct +1 · Taboo −1 · Pass 0', startTurn: 'Start turn', backMenu: 'Back to menu', stopTurn: 'End turn',
+            describe: 'Describe', dontSay: "Don't say", taboo: 'Taboo', pass: 'Pass', correct: 'Correct',
+            endOfTurn: 'End of turn', unit: 'points', endGame: 'End game', finalResult: 'Final result', newGame: 'New game',
+            readyHint: 'Hand the phone to whoever is describing',
+        };
+
+        // --- CARTAS EN INGLÉS (inglés B1-B2, sin cosas demasiado españolas) ---
+        const dbEnglish = [
+            { t: "Facebook", f: ["Social network", "Blue", "Internet", "Mark Zuckerberg"] },
+            { t: "Football", f: ["Ball", "Sport", "Goal", "Team"] },
+            { t: "Hospital", f: ["Doctor", "Sick", "Nurse", "Ambulance"] },
+            { t: "Superman", f: ["Hero", "Cape", "Fly", "Kryptonite"] },
+            { t: "IKEA", f: ["Furniture", "Sweden", "Build", "Shop"] },
+            { t: "Titanic", f: ["Ship", "Film", "Sink", "Iceberg"] },
+            { t: "Coffee", f: ["Drink", "Breakfast", "Cup", "Caffeine"] },
+            { t: "Shakespeare", f: ["Writer", "Romeo", "Hamlet", "England"] },
+            { t: "Vampire", f: ["Blood", "Dracula", "Teeth", "Bat"] },
+            { t: "Beach", f: ["Sand", "Sea", "Summer", "Towel"] },
+            { t: "YouTube", f: ["Video", "Internet", "Google", "Channel"] },
+            { t: "Harry Potter", f: ["Wizard", "Wand", "Glasses", "Hogwarts"] },
+            { t: "Pizza", f: ["Italy", "Cheese", "Round", "Slice"] },
+            { t: "Giraffe", f: ["Neck", "Animal", "Tall", "Africa"] },
+            { t: "Wedding", f: ["Marry", "Bride", "Ring", "Dress"] },
+            { t: "Microwave", f: ["Heat", "Kitchen", "Food", "Minutes"] },
+            { t: "Firefighter", f: ["Fire", "Truck", "Hose", "Rescue"] },
+            { t: "Cinema", f: ["Film", "Popcorn", "Screen", "Ticket"] },
+            { t: "Plane", f: ["Fly", "Airport", "Wings", "Pilot"] },
+            { t: "Mickey Mouse", f: ["Mouse", "Disney", "Ears", "Cartoon"] },
+            { t: "Christmas", f: ["Presents", "December", "Santa", "Tree"] },
+            { t: "Mirror", f: ["Reflection", "Look", "Glass", "Face"] },
+            { t: "Chocolate", f: ["Sweet", "Cocoa", "Milk", "Dark"] },
+            { t: "Rain", f: ["Water", "Clouds", "Umbrella", "Wet"] },
+            { t: "Clown", f: ["Circus", "Laugh", "Nose", "Scary"] },
+            { t: "Shower", f: ["Bathroom", "Water", "Wash", "Soap"] },
+            { t: "Guitar", f: ["Music", "Strings", "Instrument", "Play"] },
+            { t: "Dog", f: ["Animal", "Bark", "Best friend", "Bone"] },
+            { t: "Cat", f: ["Animal", "Meow", "Whiskers", "Nine lives"] },
+            { t: "Bed", f: ["Sleep", "Furniture", "Mattress", "Night"] },
+            { t: "Sun", f: ["Star", "Hot", "Light", "Day"] },
+            { t: "Moon", f: ["Night", "Sky", "Full", "Wolf"] },
+            { t: "Car", f: ["Wheels", "Drive", "Engine", "Road"] },
+            { t: "Bicycle", f: ["Two wheels", "Pedals", "Helmet", "Ride"] },
+            { t: "Phone", f: ["Call", "Mobile", "Talk", "Message"] },
+            { t: "Watch", f: ["Time", "Wrist", "Hour", "Hands"] },
+            { t: "Shoes", f: ["Feet", "Walk", "Laces", "Pair"] },
+            { t: "Chair", f: ["Sit", "Furniture", "Table", "Legs"] },
+            { t: "Book", f: ["Read", "Pages", "Story", "Library"] },
+            { t: "Computer", f: ["Keyboard", "Screen", "Mouse", "Internet"] },
+            { t: "School", f: ["Study", "Teacher", "Students", "Class"] },
+            { t: "Swimming pool", f: ["Swim", "Water", "Summer", "Dive"] },
+            { t: "Table football", f: ["Bar", "Players", "Game", "Spin"] },
+            { t: "Sushi", f: ["Japanese", "Rice", "Fish", "Raw"] },
+            { t: "Instagram", f: ["Photos", "Stories", "Filters", "App"] },
+            { t: "Netflix", f: ["Series", "Films", "TV", "Sofa"] },
+            { t: "Wine", f: ["Grapes", "Alcohol", "Drink", "Red"] },
+            { t: "Beer", f: ["Pint", "Alcohol", "Bar", "Foam"] },
+            { t: "Zombie", f: ["Dead", "Walking", "Brain", "Undead"] },
+            { t: "Ghost", f: ["Sheet", "Spirit", "Scary", "Invisible"] },
+            { t: "Kiss", f: ["Lips", "Love", "Couple", "Cheek"] },
+            { t: "Ring", f: ["Finger", "Jewel", "Gold", "Engagement"] },
+            { t: "Glasses", f: ["Eyes", "See", "Sight", "Lenses"] },
+            { t: "Moustache", f: ["Hair", "Lip", "Shave", "Beard"] },
+            { t: "Pirate", f: ["Ship", "Treasure", "Eye patch", "Parrot"] },
+            { t: "Astronaut", f: ["Space", "Moon", "Rocket", "Suit"] },
+            { t: "Detective", f: ["Magnifying glass", "Investigate", "Crime", "Police"] },
+            { t: "TikTok", f: ["Video", "Dance", "App", "Phone"] },
+            { t: "WhatsApp", f: ["Message", "Chat", "Text", "Green"] },
+            { t: "Amazon", f: ["Buy", "Package", "Online", "Box"] },
+            { t: "Spotify", f: ["Music", "Listen", "Songs", "Playlist"] },
+            { t: "Batman", f: ["Robin", "Bat", "Joker", "Gotham"] },
+            { t: "Spider-Man", f: ["Spider", "Web", "Climb", "Peter Parker"] },
+            { t: "Barbie", f: ["Doll", "Ken", "Pink", "Blonde"] },
+            { t: "Star Wars", f: ["Space", "Jedi", "Lightsaber", "Darth Vader"] },
+            { t: "The Simpsons", f: ["Yellow", "Homer", "Cartoon", "Springfield"] },
+            { t: "Shrek", f: ["Ogre", "Green", "Donkey", "Fiona"] },
+            { t: "Game of Thrones", f: ["Dragons", "Series", "Winter", "Stark"] },
+            { t: "Paella", f: ["Rice", "Spain", "Seafood", "Valencia"] },
+            { t: "Burger", f: ["Meat", "Bread", "Cheese", "McDonald's"] },
+            { t: "Ice cream", f: ["Cold", "Summer", "Flavour", "Cone"] },
+            { t: "Popcorn", f: ["Cinema", "Corn", "Salt", "Microwave"] },
+            { t: "Desert", f: ["Sand", "Hot", "Camel", "Dry"] },
+            { t: "Jungle", f: ["Trees", "Green", "Tarzan", "Animals"] },
+            { t: "Paris", f: ["France", "Eiffel Tower", "City", "Love"] },
+            { t: "Egypt", f: ["Pyramids", "Pharaoh", "Mummy", "Nile"] },
+            { t: "Messi", f: ["Football", "Argentina", "Ball", "Goal"] },
+            { t: "Shakira", f: ["Singer", "Colombia", "Hips", "Dance"] },
+            { t: "Money", f: ["Pay", "Euros", "Note", "Buy"] },
+            { t: "Exam", f: ["Study", "School", "Mark", "Pass"] },
+            { t: "Traffic light", f: ["Red", "Green", "Car", "Cross"] },
+            { t: "Wi-Fi", f: ["Internet", "Connection", "Password", "Router"] },
+            { t: "Lipstick", f: ["Mouth", "Make-up", "Colour", "Red"] },
+            { t: "Toothbrush", f: ["Toothpaste", "Mouth", "Clean", "Teeth"] },
+            { t: "Toilet paper", f: ["Bathroom", "Roll", "Wipe", "Toilet"] },
+            { t: "Shark", f: ["Sea", "Teeth", "Fin", "Dangerous"] },
+            { t: "Penguin", f: ["Ice", "Bird", "Antarctica", "Black and white"] },
+            { t: "Chess", f: ["Board", "Pieces", "King", "Checkmate"] },
+            { t: "Poker", f: ["Cards", "Game", "Bet", "Casino"] },
+            { t: "Tennis", f: ["Racket", "Net", "Ball", "Nadal"] },
+            { t: "Volcano", f: ["Lava", "Fire", "Eruption", "Mountain"] },
+            { t: "Key", f: ["Open", "Door", "Lock", "Metal"] },
+            { t: "Rubbish", f: ["Bin", "Throw", "Bag", "Recycle"] },
+            { t: "Albert Einstein", f: ["Physicist", "Hair", "Relativity", "Genius"] },
+            { t: "Cleopatra", f: ["Egypt", "Queen", "Julius Caesar", "Beauty"] },
+            { t: "Leonardo da Vinci", f: ["Painter", "Mona Lisa", "Inventor", "Renaissance"] },
+            { t: "Michael Jackson", f: ["Singer", "Pop", "Dance", "Moonwalk"] },
+            { t: "Marilyn Monroe", f: ["Actress", "Blonde", "Dress", "Wind"] },
+            { t: "Elvis Presley", f: ["King", "Rock", "Singer", "Hair"] },
+            { t: "Julius Caesar", f: ["Rome", "Emperor", "Cleopatra", "Empire"] },
+            { t: "Mozart", f: ["Music", "Classical", "Composer", "Piano"] },
+            { t: "Picasso", f: ["Painter", "Paintings", "Cubism", "Art"] },
+            { t: "Frida Kahlo", f: ["Painter", "Mexico", "Eyebrows", "Diego Rivera"] },
+            { t: "Christopher Columbus", f: ["Discover", "America", "Ships", "1492"] },
+            { t: "Maradona", f: ["Football", "Argentina", "Hand of God", "Napoli"] },
+            { t: "Rosalía", f: ["Singer", "Motomami", "Nails", "Flamenco"] },
+            { t: "Rafa Nadal", f: ["Tennis", "Racket", "Clay", "Roland Garros"] },
+            { t: "Cristiano Ronaldo", f: ["Football", "Portugal", "Goals", "Seven"] },
+            { t: "Dalí", f: ["Painter", "Clocks", "Moustache", "Surrealism"] },
+            { t: "SpongeBob", f: ["Sea", "Yellow", "Patrick", "Square"] },
+            { t: "Goku", f: ["Anime", "Dragon Ball", "Saiyan", "Kamehameha"] },
+            { t: "Darth Vader", f: ["Father", "Dark", "Star Wars", "Breathe"] },
+            { t: "Sherlock Holmes", f: ["Detective", "Watson", "Magnifying glass", "Pipe"] },
+            { t: "Frankenstein", f: ["Monster", "Bolts", "Green", "Scientist"] },
+            { t: "Peter Pan", f: ["Fly", "Neverland", "Tinker Bell", "Children"] },
+            { t: "Cinderella", f: ["Shoe", "Glass", "Midnight", "Princess"] },
+            { t: "Snow White", f: ["Seven", "Dwarfs", "Apple", "Witch"] },
+            { t: "Yoda", f: ["Green", "Master", "Jedi", "Force"] },
+            { t: "King Kong", f: ["Gorilla", "Giant", "Building", "New York"] },
+            { t: "Godzilla", f: ["Monster", "Japan", "Dinosaur", "Destroy"] },
+            { t: "Tarzan", f: ["Jungle", "Monkey", "Vines", "Jane"] },
+            { t: "Indiana Jones", f: ["Whip", "Hat", "Adventure", "Archaeologist"] },
+            { t: "James Bond", f: ["Agent", "007", "Spy", "Martini"] },
+            { t: "Hulk", f: ["Green", "Strong", "Avengers", "Angry"] },
+            { t: "Iron Man", f: ["Armour", "Tony Stark", "Avengers", "Red"] },
+            { t: "Captain America", f: ["Shield", "Avengers", "Hero", "Star"] },
+            { t: "Thor", f: ["Hammer", "Thunder", "God", "Avengers"] },
+            { t: "Peppa Pig", f: ["Pig", "Cartoon", "Pink", "Mud"] },
+            { t: "Statue of Liberty", f: ["New York", "Torch", "Green", "Monument"] },
+            { t: "Colosseum", f: ["Rome", "Gladiators", "Italy", "Ruins"] },
+            { t: "Great Wall of China", f: ["Asia", "Long", "Built", "Stone"] },
+            { t: "Taj Mahal", f: ["India", "Palace", "White", "Love"] },
+            { t: "Machu Picchu", f: ["Peru", "Incas", "Mountain", "Ruins"] },
+            { t: "Tower of Pisa", f: ["Italy", "Leaning", "Fall", "Monument"] },
+            { t: "London", f: ["England", "Big Ben", "Red bus", "City"] },
+            { t: "New York", f: ["USA", "Skyscrapers", "Central Park", "Big Apple"] },
+            { t: "Tokyo", f: ["Japan", "Sushi", "City", "Neon"] },
+            { t: "North Pole", f: ["Cold", "Santa", "Ice", "Bears"] },
+            { t: "Hawaii", f: ["Island", "Volcano", "Aloha", "Surf"] },
+            { t: "Venice", f: ["Canals", "Gondola", "Water", "Italy"] },
+            { t: "Australia", f: ["Kangaroo", "Koala", "Oceania", "Sydney"] },
+            { t: "Dinosaur", f: ["Extinct", "T-Rex", "Jurassic", "Meteorite"] },
+            { t: "Alien", f: ["Space", "UFO", "Green", "Planet"] },
+            { t: "Robot", f: ["Machine", "Metal", "Artificial", "Future"] },
+            { t: "Unicorn", f: ["Horse", "Horn", "Fantasy", "Rainbow"] },
+            { t: "Mermaid", f: ["Sea", "Tail", "Woman", "Ariel"] },
+            { t: "Dragon", f: ["Fire", "Fly", "Castle", "Scales"] },
+            { t: "Fairy", f: ["Wings", "Magic", "Tinker Bell", "Forest"] },
+            { t: "Ninja", f: ["Japan", "Sword", "Black", "Silent"] },
+            { t: "Samurai", f: ["Japan", "Katana", "Warrior", "Honour"] },
+            { t: "Mummy", f: ["Egypt", "Bandages", "Pyramid", "Tomb"] },
+            { t: "Witch", f: ["Broom", "Magic", "Spell", "Hat"] },
+            { t: "Lottery", f: ["Prize", "Money", "Ticket", "Luck"] },
+            { t: "Roller coaster", f: ["Ride", "Theme park", "Loop", "Scream"] },
+            { t: "Circus", f: ["Clown", "Tent", "Acrobat", "Animals"] },
+            { t: "Supermarket", f: ["Buy", "Trolley", "Food", "Pay"] },
+            { t: "Gym", f: ["Weights", "Exercise", "Sweat", "Strong"] },
+            { t: "Hairdresser", f: ["Cut", "Hair", "Scissors", "Style"] },
+            { t: "Tattoo", f: ["Skin", "Ink", "Needle", "Drawing"] },
+            { t: "Diamond", f: ["Jewel", "Ring", "Shiny", "Expensive"] },
+            { t: "Passport", f: ["Travel", "Border", "Plane", "Document"] },
+            { t: "Suitcase", f: ["Travel", "Clothes", "Luggage", "Wheels"] },
+            { t: "Telescope", f: ["Stars", "Look", "Sky", "Space"] },
+            { t: "Drums", f: ["Instrument", "Play", "Sticks", "Noise"] },
+            { t: "Flute", f: ["Blow", "Instrument", "Holes", "Music"] },
+            { t: "Trumpet", f: ["Blow", "Instrument", "Jazz", "Brass"] },
+            { t: "Violin", f: ["Strings", "Bow", "Instrument", "Classical"] },
+            { t: "Piano", f: ["Keys", "Black", "White", "Instrument"] },
+            { t: "Roulette", f: ["Casino", "Bet", "Red", "Black"] },
+            { t: "Darts", f: ["Board", "Throw", "Aim", "Pub"] },
+            { t: "Snooker", f: ["Table", "Balls", "Cue", "Pockets"] },
+            { t: "Bowling", f: ["Lane", "Ball", "Pins", "Strike"] },
+            { t: "Kite", f: ["Fly", "Wind", "String", "Sky"] },
+            { t: "Drone", f: ["Fly", "Camera", "Remote", "Propeller"] },
+            { t: "Helicopter", f: ["Fly", "Blades", "Rescue", "Sky"] },
+            { t: "Submarine", f: ["Water", "Underwater", "Ocean", "Periscope"] },
+            { t: "Chameleon", f: ["Colour", "Change", "Reptile", "Tongue"] },
+            { t: "Kangaroo", f: ["Jump", "Australia", "Pouch", "Animal"] },
+            { t: "Koala", f: ["Tree", "Eucalyptus", "Australia", "Sleep"] },
+            { t: "Panda", f: ["Black", "White", "Bamboo", "China"] },
+            { t: "Lion", f: ["King", "Mane", "Roar", "Africa"] },
+            { t: "Tiger", f: ["Stripes", "Cat", "Orange", "Animal"] },
+            { t: "Elephant", f: ["Trunk", "Ears", "Big", "Ivory"] },
+            { t: "Crocodile", f: ["Teeth", "River", "Reptile", "Green"] },
+            { t: "Steering wheel", f: ["Car", "Drive", "Turn", "Hands"] },
+            { t: "Magnet", f: ["Attract", "Metal", "Fridge", "Stick"] },
+            { t: "Compass", f: ["North", "South", "Direction", "Needle"] },
+            { t: "Map", f: ["Lost", "Paper", "Country", "Directions"] },
+            { t: "Grand Canyon", f: ["Arizona", "Hole", "USA", "River"] },
+            { t: "Google", f: ["Search", "Internet", "Browser", "Website"] },
+            { t: "Siesta", f: ["Sleep", "Afternoon", "Spain", "Lunch"] },
+            { t: "Hangover", f: ["Alcohol", "Headache", "Morning", "Party"] },
+            { t: "Mother-in-law", f: ["Mother", "Husband", "Wife", "Family"] },
+            { t: "Selfie", f: ["Photo", "Phone", "Face", "Instagram"] },
+            { t: "Karaoke", f: ["Sing", "Microphone", "Song", "Bar"] },
+            { t: "Tinder", f: ["Dating", "App", "Swipe", "Match"] },
+            { t: "Fart", f: ["Gas", "Smell", "Noise", "Bottom"] },
+            { t: "Burp", f: ["Mouth", "Gas", "Noise", "Fizzy"] },
+            { t: "Hiccups", f: ["Air", "Scare", "Water", "Breathe"] },
+            { t: "Tickle", f: ["Laugh", "Feet", "Touch", "Belly"] },
+            { t: "Underwear", f: ["Clothes", "Pants", "Boxers", "Bra"] },
+            { t: "Flip-flops", f: ["Feet", "Summer", "Beach", "Sandals"] },
+            { t: "Remote control", f: ["TV", "Channel", "Sofa", "Batteries"] },
+            { t: "Alarm clock", f: ["Wake up", "Morning", "Ring", "Snooze"] },
+            { t: "Monday", f: ["Week", "Sunday", "Work", "Day"] },
+            { t: "Traffic jam", f: ["Cars", "Traffic", "Road", "Stuck"] },
+            { t: "Mosquito", f: ["Bite", "Summer", "Buzz", "Blood"] },
+            { t: "Churros", f: ["Chocolate", "Breakfast", "Fried", "Spain"] },
+            { t: "Sangria", f: ["Wine", "Fruit", "Jug", "Spain"] },
+            { t: "New Year's Eve", f: ["Midnight", "Countdown", "Fireworks", "December"] },
+            { t: "Big Brother", f: ["House", "Cameras", "Reality show", "Evicted"] },
+            { t: "Money Heist", f: ["Robbery", "Mask", "Netflix", "Professor"] },
+            { t: "Pokémon", f: ["Pikachu", "Catch", "Ball", "Trainer"] },
+            { t: "Super Mario", f: ["Plumber", "Mushroom", "Moustache", "Nintendo"] },
+            { t: "Tetris", f: ["Blocks", "Fit", "Game", "Line"] },
+            { t: "Minions", f: ["Yellow", "Gru", "Banana", "Goggles"] },
+            { t: "Pinocchio", f: ["Nose", "Lie", "Wood", "Geppetto"] },
+            { t: "Little Red Riding Hood", f: ["Wolf", "Grandmother", "Forest", "Basket"] },
+            { t: "Bald", f: ["Hair", "Head", "Shiny", "Wig"] },
+            { t: "Pyjamas", f: ["Sleep", "Clothes", "Night", "Bed"] },
+            { t: "Artificial intelligence", f: ["Robot", "ChatGPT", "Computer", "Think"] },
+            { t: "ChatGPT", f: ["AI", "Ask", "Chat", "OpenAI"] },
+            { t: "Minecraft", f: ["Blocks", "Build", "Creeper", "Video game"] },
+            { t: "League of Legends", f: ["LoL", "Champions", "Video game", "Riot"] },
+            { t: "Twitter", f: ["Bird", "X", "Tweet", "Elon Musk"] },
+            { t: "Fortnite", f: ["Battle royale", "Dances", "Video game", "Build"] },
+            { t: "Twitch", f: ["Live", "Streamer", "Purple", "Chat"] },
+            { t: "Streamer", f: ["Live", "Twitch", "Play", "Camera"] },
+            { t: "Influencer", f: ["Instagram", "Followers", "Advertising", "Famous"] },
+            { t: "Meme", f: ["Funny", "Picture", "Internet", "Share"] },
+            { t: "Podcast", f: ["Listen", "Talk", "Episode", "Microphone"] },
+            { t: "Emoji", f: ["Face", "WhatsApp", "Icon", "Message"] },
+            { t: "Hashtag", f: ["Symbol", "Twitter", "Tag", "Trending"] },
+            { t: "Among Us", f: ["Impostor", "Spaceship", "Crewmate", "Vote"] },
+            { t: "GTA", f: ["Cars", "Steal", "Video game", "City"] },
+            { t: "Roblox", f: ["Video game", "Kids", "Blocks", "Robux"] },
+            { t: "PlayStation", f: ["Sony", "Console", "Controller", "Play"] },
+            { t: "Nintendo Switch", f: ["Console", "Mario", "Portable", "Controllers"] },
+            { t: "iPhone", f: ["Apple", "Phone", "Expensive", "Siri"] },
+            { t: "AirPods", f: ["Earphones", "Apple", "White", "Ears"] },
+            { t: "Electric scooter", f: ["Wheels", "Battery", "City", "Pavement"] },
+            { t: "Bitcoin", f: ["Crypto", "Money", "Invest", "Digital"] },
+            { t: "Spoiler", f: ["Series", "Ending", "Tell", "Film"] },
+            { t: "Hater", f: ["Hate", "Criticise", "Social media", "Comments"] },
+            { t: "Squid Game", f: ["Series", "Korean", "Doll", "Netflix"] },
+            { t: "Stranger Things", f: ["Series", "Netflix", "Eleven", "Upside Down"] },
+            { t: "Bad Bunny", f: ["Reggaeton", "Puerto Rico", "Singer", "Rabbit"] },
+            { t: "Taylor Swift", f: ["Singer", "Tour", "Blonde", "Swifties"] },
+            { t: "Lamine Yamal", f: ["Football", "Barça", "Young", "Spain"] },
+            { t: "Eurovision", f: ["Festival", "Song", "Countries", "Vote"] },
+            { t: "Discord", f: ["Chat", "Server", "Voice", "Gamers"] },
+            { t: "Duolingo", f: ["Languages", "Owl", "Streak", "App"] },
+            { t: "Clash Royale", f: ["Cards", "Towers", "Phone", "Supercell"] },
+            { t: "Zoom", f: ["Video call", "Meeting", "Camera", "Screen"] },
+            { t: "Erasmus", f: ["Students", "Exchange", "Abroad", "University"] },
+            { t: "Jet lag", f: ["Tired", "Flight", "Time zone", "Sleep"] },
+            { t: "Brunch", f: ["Breakfast", "Lunch", "Sunday", "Eggs"] },
+            { t: "Escape room", f: ["Locked", "Clues", "Puzzle", "Minutes"] },
+            { t: "Hostel", f: ["Backpacker", "Cheap", "Dorm", "Bed"] },
+            { t: "Black Friday", f: ["Shopping", "Discounts", "November", "Sales"] },
+            { t: "Airbnb", f: ["Flat", "Rent", "Holiday", "Host"] },
+            { t: "Uber", f: ["Taxi", "App", "Driver", "Ride"] },
+            { t: "Ghosting", f: ["Disappear", "Messages", "Dating", "Ignore"] },
+            { t: "Crush", f: ["Love", "Like", "Secret", "Heart"] },
+            { t: "Blind date", f: ["Meet", "Stranger", "Dinner", "Romantic"] },
+            { t: "Deadline", f: ["Date", "Finish", "Work", "Late"] },
+            { t: "Homesick", f: ["Home", "Miss", "Family", "Sad"] },
+            { t: "Small talk", f: ["Weather", "Chat", "Polite", "Strangers"] },
+            { t: "Group chat", f: ["WhatsApp", "Friends", "Messages", "Mute"] },
+            { t: "Sunscreen", f: ["Sun", "Cream", "Beach", "Burn"] },
+            { t: "Hiking", f: ["Walk", "Mountain", "Boots", "Trail"] },
+            { t: "Vegan", f: ["Meat", "Animals", "Vegetables", "Diet"] },
+            { t: "Halloween", f: ["October", "Costume", "Pumpkin", "Trick or treat"] },
+            { t: "Marathon", f: ["Run", "42", "Kilometres", "Race"] }
+        ];
+
         const wordTarget = document.getElementById("wordTarget");
         const lista = document.getElementById("wordForbidden");
 
         TurnGame({
             key: 'tabu',
-            items: dbOriginal,
+            items: { es: dbOriginal, en: dbEnglish },
             idOf: (carta) => carta.t,
-            readyHint: 'Pásale el móvil a quien vaya a describir',
             render(carta) {
                 wordTarget.innerText = carta.t;
                 lista.innerHTML = "";
@@ -438,6 +744,7 @@
                 });
             }
         });
+        G.initLang();
         G.segmented();
     </script>
 </body>

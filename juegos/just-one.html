@@ -11,57 +11,64 @@
 
     <!-- MENÚ -->
     <div id="screen-menu" class="screen menu active">
-        <a class="home-link" href="../index.html">← Juegos</a>
+        <a class="home-link" href="../index.html" data-i18n="home">← Juegos</a>
         <header class="menu-head">
             <h1>Just One</h1>
-            <p>Una palabra secreta y una pista por persona. Las pistas repetidas se eliminan.</p>
+            <p data-i18n="subtitle"></p>
         </header>
         <div class="field">
-            <span class="field-label">Espera para poder pasar</span>
-            <select id="cooldownSelect" data-seg aria-label="Espera para poder pasar">
-                <option value="0">No</option>
+            <span class="field-label" data-i18n="lang">Idioma</span>
+            <select id="langSelect" data-seg aria-label="Idioma / Language">
+                <option value="es">Español</option>
+                <option value="en">English</option>
+            </select>
+        </div>
+        <div class="field">
+            <span class="field-label" data-i18n="cooldown">Espera para poder pasar</span>
+            <select id="cooldownSelect" data-seg data-i18n-aria="cooldown">
+                <option value="0" data-i18n="no">No</option>
                 <option value="3">3 s</option>
                 <option value="5" selected>5 s</option>
                 <option value="10">10 s</option>
             </select>
         </div>
         <div class="field">
-            <span class="field-label">Puntuación</span>
-            <select id="pointsSelect" data-seg aria-label="Puntuación">
-                <option value="off" selected>Sin puntos</option>
-                <option value="on">Contar aciertos</option>
+            <span class="field-label" data-i18n="scoring">Puntuación</span>
+            <select id="pointsSelect" data-seg data-i18n-aria="scoring">
+                <option value="off" selected data-i18n="noPoints">Sin puntos</option>
+                <option value="on" data-i18n="countHits">Contar aciertos</option>
             </select>
         </div>
-        <button class="btn-main" id="btnStart">Empezar</button>
+        <button class="btn-main" id="btnStart" data-i18n="start">Empezar</button>
         <p class="hint" id="deckInfo"></p>
     </div>
 
     <!-- JUEGO -->
     <div id="screen-game" class="screen">
         <div class="bar">
-            <button class="small-btn" id="btnMenu">← Menú</button>
-            <span class="stat" id="remaining">Quedan --</span>
+            <button class="small-btn" id="btnMenu" data-i18n="menu">← Menú</button>
+            <span class="stat" id="remaining"></span>
             <span class="stat" id="score-wrap"><span id="score-board">0</span> pts</span>
         </div>
         <div class="prog"><i id="deckBar"></i></div>
-        <p class="turn-label">Enséñalo a todos menos a quien adivina</p>
+        <p class="turn-label" data-i18n="showIt">Enséñalo a todos menos a quien adivina</p>
 
         <div class="card" id="card">
             <div class="card-inner" id="word-view">
-                <div class="kicker">Palabra secreta</div>
-                <div class="word" id="palabra">Just One</div>
-                <div class="note">Una pista por persona. Las repetidas se eliminan.</div>
+                <div class="kicker" data-i18n="secret">Palabra secreta</div>
+                <div class="word" id="palabra"></div>
+                <div class="note" data-i18n="rule">Una pista por persona. Las repetidas se eliminan.</div>
             </div>
             <div class="card-inner" id="end-view" hidden>
-                <div class="word">Fin</div>
-                <p class="note">Habéis visto todas las palabras del mazo.</p>
-                <button class="btn-main" id="btnReshuffle">Barajar de nuevo</button>
+                <div class="word" data-i18n="theEnd">Fin</div>
+                <p class="note" data-i18n="endNote">Habéis visto todas las palabras del mazo.</p>
+                <button class="btn-main" id="btnReshuffle" data-i18n="reshuffle">Barajar de nuevo</button>
             </div>
         </div>
 
         <div class="controls" id="controls">
-            <button class="btn btn-pass" id="btnFail">Pasar / Fallo<small>siguiente</small></button>
-            <button class="btn btn-success" id="btnHit">Acierto<small>siguiente</small></button>
+            <button class="btn btn-pass" id="btnFail"><span data-i18n="fail">Pasar / Fallo</span><small data-i18n="next">siguiente</small></button>
+            <button class="btn btn-success" id="btnHit"><span data-i18n="correct">Acierto</span><small data-i18n="next">siguiente</small></button>
         </div>
     </div>
 
@@ -99,15 +106,81 @@
             "Mapa", "Bandera", "Semáforo", "Puente", "Ascensor"
         ];
 
+
+        // --- TEXTOS DE LA PANTALLA ---
+        G.T.es = {
+            subtitle: 'Una palabra secreta y una pista por persona. Las pistas repetidas se eliminan.',
+            home: '← Juegos', lang: 'Idioma', cooldown: 'Espera para poder pasar', no: 'No',
+            scoring: 'Puntuación', noPoints: 'Sin puntos', countHits: 'Contar aciertos', start: 'Empezar',
+            menu: '← Menú', showIt: 'Enséñalo a todos menos a quien adivina', secret: 'Palabra secreta',
+            rule: 'Una pista por persona. Las repetidas se eliminan.', theEnd: 'Fin',
+            endNote: 'Habéis visto todas las palabras del mazo.', reshuffle: 'Barajar de nuevo',
+            fail: 'Pasar / Fallo', correct: 'Acierto', next: 'siguiente',
+            deckInfo: '{total} palabras · {left} sin salir hoy', left: 'Quedan {n}',
+            confirmMenu: 'Lleváis {n} puntos. ¿Volver al menú?',
+        };
+        G.T.en = {
+            subtitle: 'One secret word and one clue per person. Duplicate clues are cancelled.',
+            home: '← Games', lang: 'Language', cooldown: 'Wait before passing', no: 'No',
+            scoring: 'Scoring', noPoints: 'No points', countHits: 'Count correct guesses', start: 'Start',
+            menu: '← Menu', showIt: 'Show it to everyone except the guesser', secret: 'Secret word',
+            rule: 'One clue each. Duplicate clues are cancelled.', theEnd: 'The end',
+            endNote: 'You have seen every word in the deck.', reshuffle: 'Shuffle again',
+            fail: 'Pass / Miss', correct: 'Correct', next: 'next',
+            deckInfo: '{total} words · {left} not played today', left: '{n} left',
+            confirmMenu: 'You have {n} points. Back to the menu?',
+        };
+
+        // --- PALABRAS EN INGLÉS (B1-B2, con bastantes de doble sentido) ---
+        const listaIngles = [
+            "Bank", "Letter", "Mermaid", "Plant", "Doll", "Cup", "Mouse", "Battery", "Monkey", "Taco",
+            "Mango", "Priest", "Radio", "Kite", "Bag", "Kangaroo", "Star", "Fountain", "Candle", "Glasses",
+            "Bed", "Key", "Shoe", "Umbrella", "Mirror", "Scissors", "Watch", "Ring", "Hat", "Trousers",
+            "Shirt", "Sock", "Suitcase", "Wallet", "Mobile phone", "Television", "Chair", "Table", "Door", "Window",
+            "Banana", "Pizza", "Egg", "Chocolate", "Sun", "Cloud", "Rose", "Cow", "Dog", "Elephant",
+            "Lion", "Tiger", "Shark", "Fish", "Bird", "Tree", "Flower", "Mountain", "Sea", "River",
+            "Fire", "Snow", "Rain", "Pirate", "Clown", "Ghost", "Vampire", "Doctor", "Firefighter", "Police",
+            "Teacher", "Witch", "Zombie", "King", "Queen", "Baby", "Grandfather", "Hammer", "Knife", "Fork",
+            "Plate", "Glass", "Bottle", "Pencil", "Paper", "Book", "Balloon", "Ball", "Guitar", "Piano",
+            "Car", "Bicycle", "Plane", "Boat", "Train", "Love", "Wedding", "Party", "Christmas", "Summer",
+            "Paris", "Egypt", "London", "China", "Hospital", "Prison", "Library", "Cinema", "Beach", "Desert",
+            "Jungle", "Farm", "Castle", "School", "Circus", "Museum", "Hotel", "Airport", "Kitchen", "Bathroom",
+            "Stadium", "Supermarket", "Church", "Cemetery", "Zoo", "Swimming pool", "Batman", "Superman", "Spider-Man", "Pikachu",
+            "Mario", "Barbie", "Tarzan", "Sherlock", "Dracula", "Frankenstein", "Messi", "Shakira", "Einstein", "Picasso",
+            "Pope", "Ninja", "Samurai", "Viking", "Mime", "Alien", "Robot", "Cyborg", "Hulk", "Thor",
+            "Yoda", "Minion", "Titanic", "Matrix", "Shrek", "Avatar", "Simpsons", "Friends", "Disney", "Netflix",
+            "YouTube", "Instagram", "Google", "Wi-Fi", "Internet", "Tetris", "Poker", "Chess", "Football", "Tennis",
+            "Basketball", "Golf", "Oscar", "Hollywood", "Emoji", "Sushi", "Burger", "Paella", "Spaghetti", "Salad",
+            "Soup", "Ice cream", "Cake", "Biscuit", "Sweets", "Popcorn", "Beer", "Wine", "Milk", "Coffee",
+            "Tea", "Juice", "Honey", "Salt", "Sugar", "Ketchup", "Dinosaur", "Dragon", "Unicorn", "Penguin",
+            "Giraffe", "Bear", "Wolf", "Eagle", "Snake", "Frog", "Mosquito", "Bee", "Spider", "Volcano",
+            "Tornado", "Rainbow", "Moon", "Universe", "Planet", "Island", "Money", "Lottery", "Job", "Holidays",
+            "Present", "Kiss", "Hug", "Music", "Dance", "Photo", "Camera", "Microphone", "Headphones", "Computer",
+            "Keyboard", "Screen", "Towel", "Soap", "Shampoo", "Perfume", "Make-up", "Brush", "Tooth", "Tongue",
+            "Eye", "Hand", "Foot", "Heart", "Brain", "Skeleton", "Mummy", "Statue", "Painting", "Rubbish",
+            "Map", "Flag", "Traffic light", "Bridge", "Lift",
+            "Bat", "Bark", "Spring", "Match", "Pitch", "Seal", "Crane", "Jam", "Date", "Fan",
+            "Bow", "Club", "Rock", "Wave", "Trunk", "Palm", "Fall", "Ruler", "Mint", "Bowl",
+            "Chest", "Stamp", "Tank", "Organ", "Mole", "Space", "Selfie", "Podcast", "Meme", "Festival",
+            "Erasmus", "Vegan", "Hangover", "Minecraft", "Pokémon"
+        ];
+
         const $ = (id) => document.getElementById(id);
-        const mazo = new G.Deck('just-one', listaCompleta);
+        // Un mazo por idioma (deck:just-one y deck:just-one-en)
+        const mazos = {};
+        const mazoDe = (l) => mazos[l] || (mazos[l] = l === 'en'
+            ? new G.Deck('just-one-en', listaIngles)
+            : new G.Deck('just-one', listaCompleta));
+        let mazo = mazoDe(G.lang);
+        const infoMazo = () => { $("deckInfo").innerText = G.t('deckInfo', { total: mazo.total, left: mazo.remaining }); };
         const cooldown = new G.Cooldown([$("btnFail")]);
         let puntuacion = 0;
         let ajustes = G.store.get('settings:just-one', { cooldown: 5, points: 'off' });
 
         $("cooldownSelect").value = ajustes.cooldown;
         $("pointsSelect").value = ajustes.points;
-        $("deckInfo").innerText = `${mazo.total} palabras · ${mazo.remaining} sin salir`;
+        G.initLang((l) => { mazo = mazoDe(l); infoMazo(); });
+        infoMazo();
         G.segmented();
 
         function mostrar(id) {
@@ -131,10 +204,10 @@
 
         function volverAlMenu() {
             if (ajustes.points === 'on' && puntuacion > 0 &&
-                !confirm(`Lleváis ${puntuacion} puntos. ¿Volver al menú?`)) return;
+                !confirm(G.t('confirmMenu', { n: puntuacion }))) return;
             cooldown.stop();
             G.keepAwake(false);
-            $("deckInfo").innerText = `${mazo.total} palabras · ${mazo.remaining} sin salir`;
+            infoMazo();
             mostrar('screen-menu');
         }
 
@@ -169,13 +242,13 @@
             $("controls").style.visibility = fin ? 'hidden' : 'visible';
             if (fin) {
                 cooldown.stop();
-                $("remaining").innerText = "Quedan 0";
+                $("remaining").innerText = G.t('left', { n: 0 });
                 $("deckBar").style.setProperty('--p', 0);
                 return;
             }
 
             $("palabra").innerText = mazo.draw();
-            $("remaining").innerText = "Quedan " + mazo.remaining;
+            $("remaining").innerText = G.t('left', { n: mazo.remaining });
             $("deckBar").style.setProperty('--p', mazo.remaining / mazo.total);
             cooldown.start(ajustes.cooldown);
         }

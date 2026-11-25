@@ -42,6 +42,7 @@ Quien sujeta el móvil escucha a los dos bandos y decide quién gana.
 ## Cómo se juega
 
 - **Un solo móvil.** Se pasa de mano en mano o lo sujeta quien presenta.
+- **En español o en inglés.** Tabú, Sound Charades y Just One tienen versión en inglés (nivel B1-B2), pensada para jugar con amigos de otros países.
 - **Con o sin puntos.** En Tabú y Sound Charades podéis jugar en un solo grupo o en dos equipos,
   con los puntos de cada turno o con un marcador hasta el número de rondas que elijáis.
 - **Sin pasar a lo loco.** En Tabú, Sound Charades y Just One, el botón de pasar se bloquea unos segundos

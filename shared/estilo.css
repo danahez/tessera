@@ -238,6 +238,7 @@ p { margin: 0; }
     font-weight: 500;
     opacity: .8;
 }
+html[lang="en"] .cooling::after { content: "wait " attr(data-cd) " s"; }
 
 @media (prefers-reduced-motion: reduce) {
     body, .card, .btn, .btn-main, .prog i { transition: none; }

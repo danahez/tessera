@@ -11,14 +11,21 @@
 
     <!-- PANTALLA 1: MENÚ -->
     <div id="screen-menu" class="screen menu active">
-        <a class="home-link" href="../index.html">← Juegos</a>
+        <a class="home-link" href="../index.html" data-i18n="home">← Juegos</a>
         <header class="menu-head">
-            <h1>Sound Charades</h1>
-            <p>Solo sonidos: sin hablar y sin usar los brazos.</p>
+            <h1 data-i18n="title"></h1>
+            <p data-i18n="subtitle"></p>
         </header>
         <div class="field">
-            <span class="field-label">Tiempo de ronda</span>
-            <select id="timeSelect" data-seg aria-label="Tiempo de ronda">
+            <span class="field-label" data-i18n="lang">Idioma</span>
+            <select id="langSelect" data-seg aria-label="Idioma / Language">
+                <option value="es">Español</option>
+                <option value="en">English</option>
+            </select>
+        </div>
+        <div class="field">
+            <span class="field-label" data-i18n="time">Tiempo de ronda</span>
+            <select id="timeSelect" data-seg data-i18n-aria="time">
                 <option value="30">30 s</option>
                 <option value="60" selected>60 s</option>
                 <option value="90">90 s</option>
@@ -26,44 +33,44 @@
             </select>
         </div>
         <div class="field">
-            <span class="field-label">Espera para poder pasar</span>
-            <select id="cooldownSelect" data-seg aria-label="Espera para poder pasar">
-                <option value="0">No</option>
+            <span class="field-label" data-i18n="cooldown">Espera para poder pasar</span>
+            <select id="cooldownSelect" data-seg data-i18n-aria="cooldown">
+                <option value="0" data-i18n="no">No</option>
                 <option value="3">3 s</option>
                 <option value="5" selected>5 s</option>
                 <option value="10">10 s</option>
             </select>
         </div>
         <div class="field">
-            <span class="field-label">Modo de juego</span>
-            <select id="modeSelect" data-seg="col" aria-label="Modo de juego">
-                <option value="solo">Un grupo</option>
-                <option value="round">Dos equipos · puntos por turno</option>
-                <option value="total">Dos equipos · marcador total</option>
+            <span class="field-label" data-i18n="mode">Modo de juego</span>
+            <select id="modeSelect" data-seg="col" data-i18n-aria="mode">
+                <option value="solo" data-i18n="modeSolo">Un grupo</option>
+                <option value="round" data-i18n="modeRound">Dos equipos · puntos por turno</option>
+                <option value="total" data-i18n="modeTotal">Dos equipos · marcador total</option>
             </select>
         </div>
         <div id="teamsBox" class="teams" hidden>
-            <input id="teamA" maxlength="16" value="Equipo 1" aria-label="Nombre del equipo 1">
-            <input id="teamB" maxlength="16" value="Equipo 2" aria-label="Nombre del equipo 2">
+            <input id="teamA" maxlength="16" data-i18n-ph="team1" data-i18n-aria="team1">
+            <input id="teamB" maxlength="16" data-i18n-ph="team2" data-i18n-aria="team2">
         </div>
         <div id="roundsBox" class="field" hidden>
-            <span class="field-label">Rondas (cada equipo juega un turno por ronda)</span>
-            <select id="roundsSelect" data-seg aria-label="Rondas">
-                <option value="0">Sin límite</option>
+            <span class="field-label" data-i18n="rounds">Rondas (cada equipo juega un turno por ronda)</span>
+            <select id="roundsSelect" data-seg data-i18n-aria="rounds">
+                <option value="0" data-i18n="noLimit">Sin límite</option>
                 <option value="3">3</option>
                 <option value="5">5</option>
                 <option value="10">10</option>
             </select>
         </div>
         <div class="field">
-            <span class="field-label">Sonidos</span>
-            <select id="soundSelect" data-seg aria-label="Sonidos">
-                <option value="on">Activados</option>
-                <option value="off">Desactivados</option>
+            <span class="field-label" data-i18n="sounds">Sonidos</span>
+            <select id="soundSelect" data-seg data-i18n-aria="sounds">
+                <option value="on" data-i18n="on">Activados</option>
+                <option value="off" data-i18n="off">Desactivados</option>
             </select>
         </div>
-        <button class="btn-main" id="btnStart">Empezar</button>
-        <p class="hint">Acierto +1 · Pasar o fallo 0</p>
+        <button class="btn-main" id="btnStart" data-i18n="start">Empezar</button>
+        <p class="hint" data-i18n="hint"></p>
     </div>
 
     <!-- PANTALLA 2: PREPARADOS -->
@@ -72,15 +79,15 @@
             <p class="ready-title" id="readyTitle"></p>
             <p class="ready-sub" id="readySub"></p>
             <div class="board" id="readyBoard"></div>
-            <button class="btn-main" id="btnGo">Empezar turno</button>
-            <button class="btn-link" data-to-menu="confirm">Volver al menú</button>
+            <button class="btn-main" id="btnGo" data-i18n="startTurn">Empezar turno</button>
+            <button class="btn-link" data-to-menu="confirm" data-i18n="backMenu">Volver al menú</button>
         </div>
     </div>
 
     <!-- PANTALLA 3: JUEGO -->
     <div id="screen-game" class="screen">
         <div class="bar">
-            <button class="icon-btn" id="btnStop" aria-label="Terminar turno">✕</button>
+            <button class="icon-btn" id="btnStop" data-i18n-aria="stopTurn">✕</button>
             <span class="clock" id="timerDisplay">60 s</span>
             <span class="stat"><span id="scoreDisplay">0</span> pts</span>
         </div>
@@ -88,38 +95,38 @@
         <p class="turn-label" id="turnLabel"></p>
 
         <div class="card">
-            <div class="kicker">Haz el sonido</div>
-            <div class="word" id="wordTarget">Palabra</div>
-            <div class="note">Sin hablar y sin usar los brazos</div>
+            <div class="kicker" data-i18n="makeSound">Haz el sonido</div>
+            <div class="word" id="wordTarget"></div>
+            <div class="note" data-i18n="rule">Sin hablar y sin usar los brazos</div>
         </div>
 
         <div class="controls">
-            <button class="btn btn-pass" data-points="0" data-flash="#2a2b30" data-cooldown>Pasar / Fallo<small>0</small></button>
-            <button class="btn btn-success" data-points="1" data-flash="#1f3328">Acierto<small>+1</small></button>
+            <button class="btn btn-pass" data-points="0" data-flash="#2a2b30" data-cooldown><span data-i18n="pass">Pasar / Fallo</span><small>0</small></button>
+            <button class="btn btn-success" data-points="1" data-flash="#1f3328"><span data-i18n="correct">Acierto</span><small>+1</small></button>
         </div>
     </div>
 
     <!-- PANTALLA 4: RESULTADO DEL TURNO -->
     <div id="screen-result" class="screen center">
         <div class="panel">
-            <p class="score-label">Fin del turno</p>
+            <p class="score-label" data-i18n="endOfTurn">Fin del turno</p>
             <p class="score-label" id="resultTitle"></p>
             <p class="score-big" id="finalScore">0</p>
-            <p class="score-label">sonidos acertados</p>
+            <p class="score-label" data-i18n="unit"></p>
             <div class="board" id="resultBoard"></div>
             <button class="btn-main" id="btnNext">Siguiente turno</button>
-            <button class="btn-link" id="btnEnd">Terminar partida</button>
-            <button class="btn-link" data-to-menu="confirm">Volver al menú</button>
+            <button class="btn-link" id="btnEnd" data-i18n="endGame">Terminar partida</button>
+            <button class="btn-link" data-to-menu="confirm" data-i18n="backMenu">Volver al menú</button>
         </div>
     </div>
 
     <!-- PANTALLA 5: RESULTADO FINAL -->
     <div id="screen-final" class="screen center">
         <div class="panel">
-            <p class="score-label">Resultado final</p>
+            <p class="score-label" data-i18n="finalResult">Resultado final</p>
             <p class="ready-title" id="finalTitle"></p>
             <div class="board" id="finalBoard"></div>
-            <button class="btn-main" data-to-menu>Nueva partida</button>
+            <button class="btn-main" data-to-menu data-i18n="newGame">Nueva partida</button>
         </div>
     </div>
 
@@ -202,16 +209,101 @@
             "Meditar (Ommm)", "Sonar de submarino", "Despegue de un cohete", "Ganso enfadado"
         ];
 
+        // --- TEXTOS DE LA PANTALLA ---
+        G.T.es = {
+            title: 'Sound Charades', subtitle: 'Solo sonidos: sin hablar y sin usar los brazos.',
+            home: '← Juegos', lang: 'Idioma', time: 'Tiempo de ronda', cooldown: 'Espera para poder pasar', no: 'No',
+            mode: 'Modo de juego', modeSolo: 'Un grupo', modeRound: 'Dos equipos · puntos por turno', modeTotal: 'Dos equipos · marcador total',
+            rounds: 'Rondas (cada equipo juega un turno por ronda)', noLimit: 'Sin límite', sounds: 'Sonidos', on: 'Activados', off: 'Desactivados',
+            start: 'Empezar', hint: 'Acierto +1 · Pasar o fallo 0', startTurn: 'Empezar turno', backMenu: 'Volver al menú', stopTurn: 'Terminar turno',
+            makeSound: 'Haz el sonido', rule: 'Sin hablar y sin usar los brazos', pass: 'Pasar / Fallo', correct: 'Acierto',
+            endOfTurn: 'Fin del turno', unit: 'sonidos acertados', endGame: 'Terminar partida', finalResult: 'Resultado final', newGame: 'Nueva partida',
+            readyHint: 'Pásale el móvil a quien vaya a hacer los sonidos',
+        };
+        G.T.en = {
+            title: 'Sound Charades', subtitle: 'Sounds only: no talking and no arms.',
+            home: '← Games', lang: 'Language', time: 'Round time', cooldown: 'Wait before passing', no: 'No',
+            mode: 'Game mode', modeSolo: 'One group', modeRound: 'Two teams · points per turn', modeTotal: 'Two teams · running score',
+            rounds: 'Rounds (each team plays one turn per round)', noLimit: 'No limit', sounds: 'Sounds', on: 'On', off: 'Off',
+            start: 'Start', hint: 'Correct +1 · Pass or miss 0', startTurn: 'Start turn', backMenu: 'Back to menu', stopTurn: 'End turn',
+            makeSound: 'Make the sound', rule: 'No talking, no arms', pass: 'Pass / Miss', correct: 'Correct',
+            endOfTurn: 'End of turn', unit: 'sounds guessed', endGame: 'End game', finalResult: 'Final result', newGame: 'New game',
+            readyHint: 'Hand the phone to whoever is making the sounds',
+        };
+
+        // --- SONIDOS EN INGLÉS ---
+        const dbEnglish = [
+            // ANIMALS
+            "Dog", "Cat", "Cow", "Horse", "Pig", "Sheep", "Rooster", "Duck", "Frog", "Bee",
+            "Mosquito", "Elephant", "Lion", "Monkey", "Snake", "Wolf", "Owl", "Crow", "Seagull", "Dolphin",
+            "Whale", "Cricket", "Donkey", "Turkey", "Mouse", "Goat", "Hen", "Bear", "Tiger", "Parrot",
+            "Seal", "Woodpecker", "Gorilla", "Hyena", "Penguin", "Camel", "Turtle", "Kangaroo", "Hippo", "Chick",
+            "Angry goose", "Pigeon cooing", "Dog drinking water",
+            // NATURE AND WEATHER
+            "Rain", "Thunderstorm", "Strong wind", "River flowing", "Ocean waves",
+            "Walking on dry leaves", "Crackling fire", "Volcano erupting", "Earthquake",
+            "Walking in deep snow", "Water dripping", "Tree falling down", "Splashing in a puddle", "Echo in the mountains",
+            // HOME AND KITCHEN
+            "Chopping onions", "Frying an egg", "Making popcorn", "Blender", "Microwave",
+            "Vacuum cleaner", "Flushing the toilet", "Brushing your teeth", "Taking a shower", "Wall clock",
+            "Hairdryer", "Creaky door", "Breaking glass", "Opening a can of soda", "Pouring water",
+            "Washing machine spinning", "Boiling kettle", "Sharpening a knife", "Toaster popping",
+            "Slamming a window", "Sweeping the floor", "Popping a cork", "Coins falling on the floor", "Scissors cutting",
+            "Locking a door", "Lighting a match", "Cutting crusty bread", "Washing the dishes", "Whisking eggs", "Turning on the tap",
+            "Ice cubes in a glass", "Coffee machine", "Pressure cooker", "Sizzling barbecue", "Opening a bag of crisps",
+            "Creaky wooden floor", "Cuckoo clock", "Bubble wrap popping",
+            // BODY AND REACTIONS
+            "Snoring", "Sneezing", "Coughing", "Hiccups", "Crying your eyes out",
+            "Laughing out loud", "Yawning", "Gargling", "Eating with your mouth open", "Passionate kiss",
+            "Whistling a song", "Sipping a drink", "Shivering with cold", "Clapping", "Blowing out candles",
+            "Blowing your nose", "Sighing", "Crunching something", "Choking", "Panting",
+            "Licking your fingers", "Fart (with your mouth)", "Spitting", "Blowing on hot soup", "Chewing gum",
+            "Heartbeat", "Drinking through a straw", "Being tickled", "Sucking a sweet", "Biting an apple",
+            "Burning your mouth with a hot drink", "Cracking your knuckles", "Smelling something disgusting", "Scratching",
+            "Burp", "Slurping noodles", "Baby crying", "Child having a tantrum", "Crowd booing",
+            // CITY AND TRANSPORT
+            "Car starting", "Car horn", "Ambulance", "Steam train", "Plane taking off",
+            "Helicopter", "Motorbike", "Bicycle bell", "Underground train braking", "Tractor",
+            "Police siren", "Car braking hard", "Garbage truck", "Car alarm", "Pedestrian crossing beep",
+            "Church bells", "High heels walking", "Fireworks", "Scooter", "Lift arriving",
+            "Automatic door", "Suitcase on wheels", "Ship's horn", "Formula 1 car", "Truck reversing", "Airport announcement",
+            "Squeaky trainers", "Flip-flops walking",
+            // TECHNOLOGY
+            "Typing on a keyboard", "Mouse click", "Typewriter", "Camera shutter", "Phone vibrating",
+            "Message notification", "Printer", "Door buzzer", "Radio searching for a station", "Game controller",
+            "Alarm clock", "Supermarket scanner", "Old dial-up modem", "Computer error sound", "Fan spinning", "Scratched record",
+            "Old mobile ringtone", "Cash machine", "Submarine sonar",
+            // TOOLS AND OBJECTS
+            "Hammer", "Electric saw", "Drill", "Dentist's drill", "Electric razor",
+            "Cash register", "Referee's whistle", "Morse code", "Whip", "Sharpening a pencil",
+            "Turning pages", "Zip", "Ripping Velcro", "Sticky tape", "Opening an umbrella", "Flat tyre", "Handsaw",
+            "Lawnmower", "Chopping wood", "Jackhammer", "Nails on a chalkboard", "Spray can",
+            "Balloon deflating", "Bubble gum popping", "Emptying a bottle (glug glug)", "Unwrapping a present", "Music box",
+            // SPORTS AND LEISURE
+            "Tennis rally", "Bowling strike", "Ping-pong", "Bouncing a basketball", "Swimming",
+            "Boxing", "Kicking a football", "Karate", "Arrow flying", "Swords clashing",
+            "Roller coaster", "Merry-go-round", "Golf swing", "Skipping rope", "Goal celebration",
+            "Throwing a stone into water", "Cannonball into the pool", "Jumping on a trampoline",
+            // MUSIC
+            "Electric guitar", "Drums", "Trumpet", "Violin", "Flute", "Piano", "Maracas", "Triangle", "Bagpipes", "Harp",
+            "Cymbals", "Xylophone", "Accordion", "Beatboxing", "Opera singer", "Yodelling",
+            // FANTASY, FILMS AND GAMES
+            "Lightsaber", "Laser gun (pew pew)", "Ghost", "Zombie", "Evil witch laughing",
+            "T-Rex roar", "Alien spaceship", "Magic spell", "Monster eating", "Collecting a coin (Super Mario)",
+            "Pac-Man eating", "Machine gun", "Huge explosion", "Robot walking", "Giant footsteps",
+            "Tarzan yell", "Chewbacca", "Darth Vader breathing", "Donald Duck", "Meditating (Ommm)", "Rocket launch"
+        ];
+
         const wordTarget = document.getElementById("wordTarget");
 
         TurnGame({
             key: 'sound-charades',
-            items: dbOriginal,
-            readyHint: 'Pásale el móvil a quien vaya a hacer los sonidos',
+            items: { es: dbOriginal, en: dbEnglish },
             render(palabra) {
                 wordTarget.innerText = palabra;
             }
         });
+        G.initLang();
         G.segmented();
     </script>
 </body>

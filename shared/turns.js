@@ -8,6 +8,9 @@
 
    La página debe tener los IDs que usa este archivo (ver tabu.html).
    #timerBar (opcional) es la barra de tiempo: se le pone --p entre 1 y 0.
+   Idioma: cfg.items puede ser una lista o { es: [...], en: [...] }; cada idioma
+   tiene su propio mazo (deck:<juego> y deck:<juego>-en). Los textos de la
+   página van en G.T (ver common.js); aquí se añaden los del motor.
    Los botones de juego llevan:
      data-points="1|0|-1"  puntos que suma/resta
      data-flash="#color"   color del destello de fondo
@@ -15,8 +18,33 @@
    ========================================================= */
 window.TurnGame = function (cfg) {
   const $ = (s) => document.querySelector(s);
-  const deck = new G.Deck(cfg.key, cfg.items, cfg.idOf);
   const settingsKey = 'settings:' + cfg.key;
+
+  // Textos del motor en los dos idiomas (la página puede sobrescribirlos)
+  const TEXTS = {
+    es: {
+      ready: '¡Preparados!', turnOf: 'Turno de {team}', round: 'Ronda {n}', roundOf: 'Ronda {n} de {total}',
+      teamGot: '{team} ha conseguido:', youGot: 'Habéis conseguido:', seeResult: 'Ver resultado',
+      nextTurn: 'Siguiente turno', tie: '¡Empate!', wins: '¡Gana {team}!', team1: 'Equipo 1', team2: 'Equipo 2',
+      confirmEnd: '¿Terminar la partida y ver el resultado?', confirmStop: '¿Terminar este turno ya?',
+      confirmMenu: 'Se perderá el marcador de la partida. ¿Volver al menú?',
+    },
+    en: {
+      ready: 'Get ready!', turnOf: "{team}'s turn", round: 'Round {n}', roundOf: 'Round {n} of {total}',
+      teamGot: '{team} scored:', youGot: 'You scored:', seeResult: 'See result',
+      nextTurn: 'Next turn', tie: "It's a tie!", wins: '{team} wins!', team1: 'Team 1', team2: 'Team 2',
+      confirmEnd: 'End the game and see the result?', confirmStop: 'End this turn now?',
+      confirmMenu: 'The scoreboard will be lost. Back to the menu?',
+    },
+  };
+  ['es', 'en'].forEach((l) => { G.T[l] = Object.assign({}, TEXTS[l], G.T[l]); });
+
+  // Un mazo por idioma, creado al empezar la partida
+  const decks = {};
+  const itemsFor = (l) => (Array.isArray(cfg.items) ? cfg.items : (cfg.items[l] || cfg.items.es));
+  const deckFor = (l) => decks[l] ||
+    (decks[l] = new G.Deck(l === 'es' ? cfg.key : cfg.key + '-' + l, itemsFor(l), cfg.idOf));
+  let deck = null;
 
   const ui = {
     time: $('#timeSelect'),
@@ -45,8 +73,9 @@ window.TurnGame = function (cfg) {
     if (s.time) ui.time.value = s.time;
     if (s.cooldown != null) ui.cooldown.value = s.cooldown;
     if (s.mode) ui.mode.value = s.mode;
-    if (s.teamA) ui.teamA.value = s.teamA;
-    if (s.teamB) ui.teamB.value = s.teamB;
+    // Los nombres por defecto no se guardan: así cambian con el idioma
+    if (s.teamA && !/^(Equipo|Team) 1$/.test(s.teamA)) ui.teamA.value = s.teamA;
+    if (s.teamB && !/^(Equipo|Team) 2$/.test(s.teamB)) ui.teamB.value = s.teamB;
     if (s.rounds != null) ui.rounds.value = s.rounds;
     ui.sound.value = G.soundOn ? 'on' : 'off';
     syncMenu();
@@ -57,8 +86,8 @@ window.TurnGame = function (cfg) {
       time: parseInt(ui.time.value, 10),
       cooldown: parseInt(ui.cooldown.value, 10),
       mode: ui.mode.value,
-      teamA: ui.teamA.value.trim() || 'Equipo 1',
-      teamB: ui.teamB.value.trim() || 'Equipo 2',
+      teamA: ui.teamA.value.trim() || G.t('team1'),
+      teamB: ui.teamB.value.trim() || G.t('team2'),
       rounds: parseInt(ui.rounds.value, 10),
     };
     G.store.set(settingsKey, s);
@@ -85,7 +114,7 @@ window.TurnGame = function (cfg) {
 
   function roundText() {
     if (S.mode !== 'total') return '';
-    return S.rounds ? `Ronda ${roundNo()} de ${S.rounds}` : `Ronda ${roundNo()}`;
+    return S.rounds ? G.t('roundOf', { n: roundNo(), total: S.rounds }) : G.t('round', { n: roundNo() });
   }
 
   function renderBoard(el) {
@@ -110,14 +139,15 @@ window.TurnGame = function (cfg) {
   function newGame() {
     G.unlockAudio();
     S = readSettings();
+    deck = deckFor(G.lang);
     teams = [{ name: S.teamA, score: 0 }, { name: S.teamB, score: 0 }];
     turn = 0;
     showReady();
   }
 
   function showReady() {
-    $('#readyTitle').textContent = isTeams() ? `Turno de ${team().name}` : '¡Preparados!';
-    $('#readySub').textContent = [roundText(), cfg.readyHint].filter(Boolean).join(' · ');
+    $('#readyTitle').textContent = isTeams() ? G.t('turnOf', { team: team().name }) : G.t('ready');
+    $('#readySub').textContent = [roundText(), G.t('readyHint')].filter(Boolean).join(' · ');
     renderBoard($('#readyBoard'));
     show('screen-ready');
   }
@@ -173,13 +203,13 @@ window.TurnGame = function (cfg) {
     G.keepAwake(false);
     if (isTeams()) team().score += points;
 
-    $('#resultTitle').textContent = isTeams() ? `${team().name} ha conseguido:` : 'Habéis conseguido:';
+    $('#resultTitle').textContent = isTeams() ? G.t('teamGot', { team: team().name }) : G.t('youGot');
     $('#finalScore').textContent = points;
     renderBoard($('#resultBoard'));
 
     turn++;
     const finished = S.mode === 'total' && S.rounds && turn >= S.rounds * 2;
-    $('#btnNext').textContent = finished ? 'Ver resultado' : (isTeams() ? `Turno de ${team().name}` : 'Siguiente turno');
+    $('#btnNext').textContent = finished ? G.t('seeResult') : (isTeams() ? G.t('turnOf', { team: team().name }) : G.t('nextTurn'));
     $('#btnNext').dataset.finished = finished ? '1' : '';
     $('#btnEnd').hidden = S.mode !== 'total' || finished;
     show('screen-result');
@@ -188,7 +218,7 @@ window.TurnGame = function (cfg) {
   function showFinal() {
     const [a, b] = teams;
     $('#finalTitle').textContent =
-      a.score === b.score ? '¡Empate!' : `¡Gana ${a.score > b.score ? a.name : b.name}!`;
+      a.score === b.score ? G.t('tie') : G.t('wins', { team: a.score > b.score ? a.name : b.name });
     turn = -1; // ningún equipo resaltado como "en turno"
     renderBoard($('#finalBoard'));
     show('screen-final');
@@ -201,15 +231,15 @@ window.TurnGame = function (cfg) {
     if ($('#btnNext').dataset.finished) showFinal(); else showReady();
   });
   $('#btnEnd').addEventListener('click', () => {
-    if (confirm('¿Terminar la partida y ver el resultado?')) showFinal();
+    if (confirm(G.t('confirmEnd'))) showFinal();
   });
   $('#btnStop').addEventListener('click', () => {
-    if (confirm('¿Terminar este turno ya?')) endTurn();
+    if (confirm(G.t('confirmStop'))) endTurn();
   });
   document.querySelectorAll('[data-to-menu]').forEach((b) =>
     b.addEventListener('click', () => {
       if (b.dataset.toMenu === 'confirm' && S && S.mode === 'total' &&
-          !confirm('Se perderá el marcador de la partida. ¿Volver al menú?')) return;
+          !confirm(G.t('confirmMenu'))) return;
       show('screen-menu');
     })
   );

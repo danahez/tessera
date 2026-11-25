@@ -5,7 +5,7 @@
    se usa la copia guardada.
 
    Al añadir un juego nuevo, añade su archivo a PRECACHE. */
-const CACHE = 'juegos-v3';
+const CACHE = 'juegos-v4';
 const PRECACHE = [
   './',
   'index.html',

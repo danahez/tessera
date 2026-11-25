@@ -222,9 +222,52 @@
       });
       sel.addEventListener('change', sync);
       sync();
+      // Vuelve a copiar el texto de las opciones (tras cambiar de idioma)
+      sel._segRefresh = () => btns.forEach((b, i) => { b.textContent = sel.options[i].textContent; });
       sel.hidden = true;
       sel.after(box);
     });
+  };
+
+  /* ---------- Idioma (español / inglés) ----------
+     Se elige en el menú de Tabú, Sound Charades y Just One y se recuerda
+     para todos los juegos (clave 'lang').
+     Cada página pone sus textos en G.T = { es: {...}, en: {...} } y marca
+     los elementos con data-i18n="clave" (texto), data-i18n-aria (aria-label)
+     o data-i18n-ph (placeholder). G.t('clave', {n: 3}) sustituye {n}. */
+  G.lang = G.store.get('lang', 'es') === 'en' ? 'en' : 'es';
+  G.T = { es: {}, en: {} };
+  G.setLang = function (lang) {
+    G.lang = lang === 'en' ? 'en' : 'es';
+    G.store.set('lang', G.lang);
+  };
+  G.t = function (key, vars) {
+    let s = G.T[G.lang][key];
+    if (s == null) s = G.T.es[key];
+    if (s == null) s = key;
+    if (vars) s = s.replace(/\{(\w+)\}/g, (m, k) => (vars[k] != null ? vars[k] : ''));
+    return s;
+  };
+  G.translate = function (root = document) {
+    document.documentElement.lang = G.lang;
+    root.querySelectorAll('[data-i18n]').forEach((el) => { el.textContent = G.t(el.dataset.i18n); });
+    root.querySelectorAll('[data-i18n-aria]').forEach((el) => el.setAttribute('aria-label', G.t(el.dataset.i18nAria)));
+    root.querySelectorAll('[data-i18n-ph]').forEach((el) => el.setAttribute('placeholder', G.t(el.dataset.i18nPh)));
+    root.querySelectorAll('select[data-seg]').forEach((sel) => sel._segRefresh && sel._segRefresh());
+  };
+  /** Conecta el <select id="langSelect"> del menú y traduce la página.
+      Llamar ANTES de G.segmented(). onChange se ejecuta al cambiar de idioma. */
+  G.initLang = function (onChange) {
+    const sel = document.getElementById('langSelect');
+    if (sel) {
+      sel.value = G.lang;
+      sel.addEventListener('change', () => {
+        G.setLang(sel.value);
+        G.translate();
+        if (onChange) onChange(G.lang);
+      });
+    }
+    G.translate();
   };
 
   window.G = G;
