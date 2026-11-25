@@ -78,6 +78,8 @@ body{
 /* ---------- Selección ---------- */
 #screen-select{position:relative}
 .home-link{position:absolute;left:16px;top:max(16px, env(safe-area-inset-top))}
+.lang-toggle{position:absolute;right:16px;top:max(16px, env(safe-area-inset-top))}
+html[lang="en"] .ring.done #timer{font-size:13cqw}
 .brand{text-align:center;padding:6px 0 18px}
 .round-pill{
   display:inline-block;
@@ -267,8 +269,9 @@ body{
 <body>
 
 <!-- PANTALLA 1: ELEGIR CARTA -->
-<section id="screen-select" class="screen active" aria-label="Elegir carta">
-  <a class="btn small home-link" href="../index.html">← Juegos</a>
+<section id="screen-select" class="screen active" data-i18n-aria="selectScreen">
+  <a class="btn small home-link" href="../index.html" data-i18n="home">← Juegos</a>
+  <button class="btn small lang-toggle" id="btn-lang" type="button" data-i18n="otherLang">English</button>
   <header class="brand">
     <div class="round-pill" id="round-pill">Ronda 1</div>
     <h1 class="logo">Gestrudis</h1>
@@ -278,17 +281,17 @@ body{
   <div class="grid" id="grid"></div>
 
   <footer class="select-foot">
-    <button class="btn" id="btn-shuffle" type="button">🔀 Ver otras 4 cartas</button>
+    <button class="btn" id="btn-shuffle" type="button" data-i18n="shuffle">🔀 Ver otras 4 cartas</button>
     <p class="deck-info" id="deck-info"></p>
   </footer>
 </section>
 
 <!-- PANTALLA 2: JUGAR -->
-<section id="screen-play" class="screen" aria-label="Ronda en juego">
+<section id="screen-play" class="screen" data-i18n-aria="playScreen">
   <div class="topbar">
-    <button class="btn small" id="btn-back" type="button">← Cartas</button>
+    <button class="btn small" id="btn-back" type="button" data-i18n="back">← Cartas</button>
     <div class="round" id="round-label">Ronda 1</div>
-    <button class="btn small" id="btn-sound" type="button" aria-label="Sonido">🔊</button>
+    <button class="btn small" id="btn-sound" type="button" data-i18n-aria="sound">🔊</button>
   </div>
 
   <main class="play">
@@ -542,14 +545,263 @@ const RAW = [
 ];
 
 /* =========================================================
+   MAZO EN INGLÉS (B1-B2, sin cosas demasiado españolas)
+   ========================================================= */
+const RAW_EN = [
+  // --- Actions and gestures ---
+  ["✋","Hand actions",["Stroking","Grabbing","Pushing","Scratching","Hitting","Tickling"]],
+  ["😭","Emotions",["Crying","Laughing out loud","Getting scared","Getting angry","Being surprised","Falling in love"]],
+  ["🥶","Feelings",["Being cold","Being hot","Being sleepy","Being hungry","Being in a hurry","Being afraid of heights"]],
+  ["😤","Personalities",["Shy","Annoying","Show-off","Absent-minded","Grumpy","Nosy"]],
+  ["🤥","Little lies",["Lying","Telling the truth","Getting caught","Pretending nothing happened","Blaming someone else","Looking innocent"]],
+  ["👀","Nosy neighbours",["Spying","Listening behind a door","Looking through a window","Following someone","Hiding","Using binoculars"]],
+  ["🤕","Ouch!",["Headache","Stomach ache","Twisting your ankle","Burning your finger","Toothache","Hitting your funny bone"]],
+  ["🤧","Having a cold",["Sneezing","Coughing","Blowing your nose","Having an allergy","Drinking water","Taking a cough sweet"]],
+  ["🔑","Absent-minded",["Looking for your keys","Looking for your phone","Losing a sock","Tripping over","Locking the door","Being late"]],
+  ["🥤","Small challenges",["Drinking from a bottle","Opening a jar","Cracking a nut","Eating with chopsticks","Burning yourself with coffee","Having hiccups"]],
+  ["🙄","Silly excuses",["The dog ate my homework","My alarm didn't go off","I totally forgot","There was a lot of traffic","I thought it was tomorrow","My phone died"]],
+
+  // --- Everyday life ---
+  ["🪥","Personal care",["Brushing your teeth","Putting on deodorant","Combing your hair","Washing your face","Cutting your nails","Looking in the mirror"]],
+  ["🚿","In the shower",["Ice-cold water","Singing in the shower","Running out of hot water","Shampoo in your eyes","Slipping in the bath","Drying yourself with a towel"]],
+  ["💄","Getting ready",["Putting on make-up","Shaving","Painting your nails","Drying your hair","Putting in contact lenses","Spraying perfume"]],
+  ["👖","Getting dressed",["Putting on tight jeans","Tying your shoelaces","Tying a tie","Doing up buttons","Putting on tights","Taking off a jumper"]],
+  ["😴","Bedtime",["Falling asleep on the sofa","Tossing and turning","Turning off the alarm","Yawning","Dreaming","Waking up with a fright"]],
+  ["🌙","At night",["Counting sheep","Seeing a shooting star","Howling at the moon","Sleepwalking","Getting water in the dark","Hearing someone snore"]],
+  ["🧹","Housework",["Sweeping","Ironing","Washing the dishes","Cleaning the windows","Hanging out the washing","Vacuuming"]],
+  ["🚽","In the bathroom",["Going to the toilet","Flushing the toilet","Running out of toilet paper","Washing your hands","Looking at your phone","Locking the door"]],
+  ["🚏","Waiting",["Queuing","Jumping the queue","Waiting for the bus","Missing the bus","Running to catch it","Checking your watch"]],
+  ["🚇","Public transport",["Packed underground train","Holding on to the bar","Giving up your seat","Validating your ticket","Missing your stop","Busker"]],
+  ["🚦","Traffic",["Traffic jam","Red light","Parallel parking","Parking ticket","Roundabout","Car being towed away"]],
+  ["🚗","Behind the wheel",["Driving","Changing a tyre","Filling up with petrol","Honking the horn","Cleaning the windscreen","Having a crash"]],
+  ["📦","Moving house",["Carrying boxes","Building IKEA furniture","Carrying a sofa up the stairs","Painting a wall","Hanging a picture","Losing a screw"]],
+  ["🔨","DIY",["Hammering","Drilling","Sawing","Screwing","Sanding","Hitting your finger"]],
+  ["🌱","In the garden",["Watering the plants","Mowing the lawn","Planting seeds","Pulling up weeds","Pruning a tree","Bee sting"]],
+  ["🐕","Walking the dog",["Picking up the poo","Throwing the ball","Pulling on the lead","Being dragged by the dog","Dog running away","Giving a treat"]],
+  ["👶","Babies",["Changing a nappy","Giving a bottle","Burping the baby","Rocking the cradle","Crawling","First steps"]],
+  ["🍼","Toddlers",["Tantrum","Asking to be picked up","Sucking your thumb","Hiding behind mum","Blowing bubbles","Going on the swings"]],
+  ["👵","Grandparents",["Knitting","Feeding the pigeons","Reading the newspaper","Having a nap","Playing bingo","Giving pocket money to the grandkids"]],
+  ["🧘","Relaxing",["Meditating","Getting a massage","Having a bubble bath","Lying in a hammock","Putting on a face mask","Listening to music with headphones"]],
+
+  // --- Food and drink ---
+  ["🍝","Eating with style",["Eating spaghetti","Chewing gum","Having soup","Peeling a banana","Licking an ice cream","Biting an apple"]],
+  ["☕","Breakfast",["Dunking biscuits in milk","Making coffee","Making toast","Spreading butter","Drinking juice","Eating the crumbs"]],
+  ["🍳","In the kitchen",["Cooking pasta","Cracking an egg","Stirring soup","Chopping onions","Tasting with a spoon","Burning the food"]],
+  ["🍖","Barbecue",["Flipping a burger","Fanning the fire","Burning a sausage","Eating too much","Adding sauce","Waving away the smoke"]],
+  ["🍕","Food",["Pizza","Burger","Pancakes","Paella","Sushi","Tacos"]],
+  ["🍟","Fast food",["French fries","Chicken nuggets","Milkshake","Doughnut","Nachos","Fried chicken"]],
+  ["🍜","Food from around the world",["Ramen","Kebab","Hot dog","Fondue","Curry","Croissant"]],
+  ["🍉","Fruit",["Banana","Watermelon","Pineapple","Coconut","Lemon","Grapes"]],
+  ["🍭","Sweets",["Ice cream","Chocolate","Gummy bears","Lollipop","Popcorn","Candy floss"]],
+  ["🌶️","Flavours",["Spicy","Sour","Sweet","Bitter","Salty","Very hot"]],
+  ["🍽️","At the restaurant",["Reading the menu","Calling the waiter","Tasting the food","Asking for the bill","Complaining about the food","Leaving a tip"]],
+
+  // --- Parties, music and free time ---
+  ["🎂","Birthday",["Opening a present","Wrapping a present","Blowing out candles","Eating cake","Throwing confetti","Taking a birthday photo"]],
+  ["🪩","Night out",["Queuing for the club","Dancing to reggaeton","Doing karaoke","Tripping while dancing","Losing your voice","Falling asleep at dawn"]],
+  ["🍻","Wild party",["Being drunk","Having a hangover","Making a toast","Spilling a drink","Dancing on a table","Falling asleep at a party"]],
+  ["💃","Dancing",["Dancing salsa","Dancing rock and roll","Breakdancing","Dancing ballet","Twerking","Dancing like a robot"]],
+  ["🕺","Famous dances",["Flamenco","Tango","Macarena","Conga","Waltz","Can-can"]],
+  ["🎤","Let's sing",["Singing terribly","Singing opera","Rapping","Humming","Whistling","Losing your voice"]],
+  ["🤘","Rock star",["Playing air guitar","Playing air drums","Conducting an orchestra","Stage diving","Taking a bow","Getting a round of applause"]],
+  ["🎸","Instruments",["Guitar","Drums","Violin","Trumpet","Piano","Flute"]],
+  ["🪗","Unusual instruments",["Harp","Accordion","Saxophone","Bagpipes","Castanets","Triangle"]],
+  ["🎳","Fun with friends",["Bowling","Pool","Darts","Table football","Ping-pong","Mini golf"]],
+  ["🎲","Board games",["Monopoly","Risk","Cluedo","Chess","Ludo","Trivial Pursuit"]],
+  ["🎰","Casino",["Roulette","Dice","Blackjack","Croupier","Slot machine","Winning the jackpot"]],
+  ["🪀","Playground games",["Hide and seek","Tag","Skipping rope","Spinning top","Hopscotch","Blind man's buff"]],
+  ["🧒","Kids' games",["Musical statues","Dodgeball","Musical chairs","Simon says","Rock, paper, scissors","Broken telephone"]],
+  ["🧩","Hobbies",["Doing jigsaw puzzles","Doing crosswords","Playing the ukulele","Making origami","Birdwatching","Building models"]],
+  ["🎨","Art",["Painting a picture","Sculpting","Making pottery","Posing as a model","Spraying graffiti","Living statue"]],
+  ["🎪","The circus",["Juggler","Lion tamer","Trapeze artist","Tightrope walker","Human cannonball","Sword swallower"]],
+  ["🎢","Theme park",["Roller coaster","Big wheel","Bumper cars","Haunted house","Merry-go-round","Drop tower"]],
+  ["🪄","Magic",["Pulling a rabbit out of a hat","Sawing someone in half","Making something float","Card trick","Disappearing","Hypnotising"]],
+  ["🎭","Fancy dress party",["Dressing up as a clown","Dressing up as a vampire","Putting on a mask","Not recognising someone","Taking off your costume","Face painting"]],
+
+  // --- Special days ---
+  ["🎃","Halloween",["Trick or treat","Carving a pumpkin","Ghost","Witch","Haunted house","Mummy"]],
+  ["🎄","Christmas",["Santa Claus","Opening presents","Decorating the tree","Eating Christmas cookies","Singing carols","Santa's reindeer"]],
+  ["🥂","New Year's Eve",["New Year's kiss","Countdown","Making a toast","Fireworks","Dancing until late","New Year's hangover"]],
+  ["💍","Wedding",["Wedding dress","Rings","Throwing the bouquet","Wedding banquet","Honeymoon","First dance"]],
+  ["🎉","Festivals around the world",["Carnival in Rio","Oktoberfest","Holi","Chinese New Year","La Tomatina","Day of the Dead"]],
+  ["🏆","Celebrations",["Lifting a trophy","Standing on the podium","Spraying champagne","Lap of honour","Throwing the coach in the air","Biting the medal"]],
+
+  // --- Love ---
+  ["😘","Flirting",["Chatting someone up","Giving a kiss","Making a heart with your hands","Giving someone a seductive look","Turning someone down","Getting jealous"]],
+
+  // --- Technology ---
+  ["💻","At the computer",["Typing on the keyboard","Using the mouse","Getting angry with the screen","Gaming online with headphones","Taking a selfie","Smashing the monitor"]],
+  ["💬","Your phone",["WhatsApp","Video call","Voice message","Missed call","Family group chat","Emoji"]],
+  ["🤳","Influencers",["Being an influencer","Filming a video","Doing an unboxing","Making a tutorial","Reading the comments","Deleting a video"]],
+  ["🔋","Tech disasters",["Forgotten password","No Wi-Fi","Battery at 1%","Cracked screen","Endless update","Frozen computer"]],
+  ["💡","Light and shadow",["Switching on a light bulb","Being dazzled","Making shadow puppets","Blowing out a candle","Using a torch","Fireworks"]],
+
+  // --- Work and studies ---
+  ["🧑‍💻","Working from home",["Working in your pyjamas","Turning off the camera","Muting the microphone","Talking while on mute","Sharing your screen","Joining the wrong meeting"]],
+  ["📝","Exams",["Chewing your pen","Cheating","Studying the night before","Going blank","Putting your hand up","Handing in the exam"]],
+  ["🎒","First day of school",["Crying at the gate","Making friends","Carrying a heavy backpack","Sharpening a pencil","Eating in the canteen","Going out for break"]],
+  ["👨‍🚒","Jobs",["Firefighter","Police officer","Doctor","Chef","Photographer","Hairdresser"]],
+  ["🕵️","Movie jobs",["Lawyer","Astronaut","Detective","Pilot","Scientist","Spy"]],
+  ["🔧","Trades",["Plumber","Electrician","Mechanic","Carpenter","Builder","Gardener"]],
+  ["🎙️","Famous people",["Politician","TV presenter","Journalist","Actor","Singer","Model"]],
+  ["🎥","Film set",["Film director","Stunt double","Clapperboard","Red carpet","Winning an Oscar","Signing autographs"]],
+  ["🧪","Mad scientist",["Mixing liquids","Looking through a microscope","Causing an explosion","Putting on safety goggles","Trying a potion","Creating a monster"]],
+  ["💸","Money",["Counting banknotes","Taking money out of a cash machine","Finding a coin","Breaking your piggy bank","Winning the lottery","Going broke"]],
+  ["🛍️","Shopping",["Trying on clothes","Haggling","Paying in cash","Returning something","The sales","Carrying lots of bags"]],
+
+  // --- Health ---
+  ["🦷","At the dentist",["Opening your mouth","Spitting in the sink","Dentist's drill","Mouthwash","Toothache","Numb mouth after the anaesthetic"]],
+  ["🏥","Check-up",["Having an X-ray","Putting on a hospital gown","Weighing yourself","Having your blood pressure taken","Using a thermometer","Getting an injection"]],
+  ["🩼","Injured",["Walking on crutches","Wearing a cast","Using a wheelchair","Falling over","Slipping","Putting ice on it"]],
+  ["🚨","Emergencies",["Putting out a fire","Rescuing a cat from a tree","Giving CPR","Calling emergency services","Ambulance siren","Evacuating a building"]],
+
+  // --- Adventure and mystery ---
+  ["🚔","Cops and robbers",["Thief","Detective","Undercover cop","Witness","Prisoner","Fugitive"]],
+  ["💰","The great heist",["Being a burglar","Robbing a bank","Running away","Cracking a safe","Wearing a mask","Getting arrested"]],
+  ["🕶️","Secret agent",["Dodging lasers","Using a hidden microphone","Defusing a bomb","Chasing a villain","Escaping from an explosion","Wearing a disguise"]],
+  ["😱","So scary",["Being scared","Watching a horror film","Hearing a noise","Hiding","Screaming","Looking under the bed"]],
+  ["🧟‍♂️","Zombie apocalypse",["Running from zombies","Barricading yourself in","Looking for food","Getting bitten","Turning into a zombie","Finding a shelter"]],
+  ["🏝️","Castaway",["Making fire with sticks","Fishing with a spear","Writing SOS in the sand","Opening a coconut","Message in a bottle","Seeing a ship in the distance"]],
+  ["🏴‍☠️","Pirates",["Walking the plank","Looking for treasure","Wooden leg","Parrot on your shoulder","Boarding a ship","Telescope"]],
+  ["🌵","Wild West",["Duel at noon","Throwing a lasso","Walking into the saloon","Panning for gold","Robbing a stagecoach","Wanted poster"]],
+  ["🏰","Medieval castle",["Catapult","Sword fight","Archer","Blacksmith","Eating a feast with your hands","Drawbridge"]],
+  ["👑","At the palace",["King","Queen","Prince","Princess","Knight","Jester"]],
+  ["🎩","Classic costumes",["Magician","Clown","Pirate","Ninja","Cowboy","Samurai"]],
+
+  // --- Travel and places ---
+  ["🛫","At the airport",["Going through security","Queuing","Missing your flight","Dragging a suitcase","Looking for the gate","Sleeping in the waiting area"]],
+  ["🧳","On holiday",["Packing your suitcase","Arriving at the hotel","Getting lost","Taking photos","Buying souvenirs","Forgetting your passport"]],
+  ["🗺️","Road trip",["Checking the GPS","Taking the wrong exit","Stopping at a petrol station","Falling asleep in the passenger seat","Arguing about the route","Singing in the car"]],
+  ["🛳️","On a cruise",["Looking over the side","Sunbathing","Getting seasick","Dancing on deck","Watching a show","Whale watching"]],
+  ["🏖️","At the beach",["Putting on sun cream","Swimming","Building a sandcastle","Sunbathing","Playing frisbee","Surfing"]],
+  ["🏊","At the pool",["Doing a cannonball","Floating on your back","Diving underwater","Going down the slide","Getting into cold water","Running out of breath"]],
+  ["⛺","Camping",["Putting up the tent","Lighting a fire","Fishing","Toasting marshmallows","Swatting mosquitoes","Sleeping in a sleeping bag"]],
+  ["🐟","Fishing",["Casting the rod","Putting on the bait","Getting a bite","Catching a boot","Falling asleep waiting","The fish that got away"]],
+  ["🏔️","Mountains",["Walking uphill","Skiing down","Climbing","Hiking","Falling in the snow","Reaching the top"]],
+  ["❄️","Winter",["Snowman","Ice skating","Shivering","Throwing a snowball","Skiing","Slipping on ice"]],
+  ["🌴","Jungle",["Swinging on vines","Giant snake","Mosquitoes","Discovering a temple","Getting lost","Crossing a river"]],
+  ["🏜️","Desert",["Being thirsty","Walking on sand","Finding an oasis","Seeing a mirage","Riding a camel","Sandstorm"]],
+  ["🚀","Space",["Floating","Being an astronaut","Walking on the Moon","Looking at the Earth","Being abducted","Taking off in a rocket"]],
+  ["🔴","On Mars",["Looking for life","Driving a rover","Putting on a helmet","Jumping in low gravity","Meeting an alien","Planting a flag"]],
+  ["🌍","Countries",["Spain","United States","Japan","Italy","France","Mexico"]],
+  ["🏙️","World cities",["Paris","New York","Rome","London","Tokyo","Venice"]],
+  ["🗽","Monuments",["Eiffel Tower","Statue of Liberty","Leaning Tower of Pisa","Pyramids of Egypt","Great Wall of China","Colosseum"]],
+  ["⛈️","Weather",["Rain","Storm","Strong wind","Hail","Heatwave","Fog"]],
+  ["🌋","Natural disasters",["Earthquake","Tsunami","Volcano","Tornado","Flood","Avalanche"]],
+  ["✈️","Transport",["Plane","Boat","Train","Helicopter","Motorbike","Bicycle"]],
+  ["🛹","Unusual vehicles",["Unicycle","Roller skates","Stilts","Sledge","Tandem bike","Kayak"]],
+
+  // --- History ---
+  ["🏛️","Historical figures",["Albert Einstein","Cleopatra","Julius Caesar","Leonardo da Vinci","Napoleon","Mozart"]],
+  ["🎓","More historical figures",["Christopher Columbus","Gandhi","Isaac Newton","Frida Kahlo","Marie Curie","Charlie Chaplin"]],
+  ["⏳","Eras",["Prehistory","Ancient Egypt","Roman Empire","Middle Ages","Wild West","The future"]],
+  ["⚔️","Time travel",["Vikings","Pyramids","Gladiators","Knights","Cowboys","Astronauts"]],
+  ["🗿","Time machine",["Stone Age","Egyptians","Romans","Pirates","Samurai warriors","People from the future"]],
+  ["📜","Historic moments",["French Revolution","Moon landing","Discovery of America","Fall of the Roman Empire","Building the pyramids","Invention of the internet"]],
+
+  // --- Animals ---
+  ["🦁","Wild animals",["Lion","Elephant","Monkey","Snake","Penguin","Kangaroo"]],
+  ["🐯","Jungle animals",["Gorilla","Tiger","Crocodile","Giraffe","Zebra","Hippo"]],
+  ["🐙","Sea creatures",["Shark","Dolphin","Octopus","Whale","Jellyfish","Crab"]],
+  ["🐄","Farm",["Cow","Pig","Hen","Sheep","Goat","Horse"]],
+  ["🦅","Birds",["Eagle","Owl","Penguin","Flamingo","Peacock","Rooster"]],
+  ["🐶","Pets",["Dog","Cat","Parrot","Hamster","Fish","Tortoise"]],
+  ["🐰","Small pets",["Rabbit","Canary","Guinea pig","Ferret","Iguana","Goldfish"]],
+  ["🦥","Strange animals",["Platypus","Sloth","Chameleon","Ostrich","Koala","Skunk"]],
+  ["🐸","Animal impressions",["Monkey","Chicken","Duck","Worm","Frog","Seal"]],
+  ["🐝","Bugs",["Fly","Mosquito","Spider","Bee","Ant","Butterfly"]],
+  ["🪳","Gross creatures",["Cockroach","Rat","Slug","Maggot","Leech","Head louse"]],
+  ["🦖","Dinosaurs",["Tyrannosaurus","Triceratops","Velociraptor","Pterodactyl","Diplodocus","Stegosaurus"]],
+
+  // --- Sports ---
+  ["⚽","Sports",["Football","Basketball","Tennis","Swimming","Cycling","Boxing"]],
+  ["🏅","Olympic Games",["High jump","Rhythmic gymnastics","Weightlifting","Archery","Rowing","Hurdles"]],
+  ["🥌","Unusual sports",["Curling","Fencing","Sumo","Golf","Horse riding","Javelin"]],
+  ["🥅","Football moments",["Scoring a goal","Celebrating a goal","Diving for a foul","Showing a red card","Taking a penalty","Doing the Mexican wave"]],
+  ["🪂","Adventure sports",["Skydiving","Bungee jumping","Rafting","Paragliding","Scuba diving","Zip line"]],
+  ["🏋️","At the gym",["Lifting weights","Running on the treadmill","Doing sit-ups","Doing push-ups","Doing yoga","Looking in the mirror"]],
+
+  // --- Films, TV and fiction ---
+  ["🎮","Video games",["Super Mario","Minecraft","Pac-Man","Fortnite","Tetris","Pokémon"]],
+  ["📺","TV series",["The Simpsons","Stranger Things","Game of Thrones","Money Heist","Breaking Bad","SpongeBob"]],
+  ["📡","TV shows",["MasterChef","The Voice","Big Brother","Who Wants to Be a Millionaire?","The news","Weather forecast"]],
+  ["🎬","Films",["Titanic","Jurassic Park","Star Wars","Jaws","The Matrix","Rocky"]],
+  ["🧸","Animated films",["Toy Story","Shrek","Frozen","Finding Nemo","Up","The Lion King"]],
+  ["🤠","Adventure sagas",["Indiana Jones","Pirates of the Caribbean","Back to the Future","The Lord of the Rings","Mission: Impossible","Ghostbusters"]],
+  ["🍿","At the cinema",["Eating popcorn","Telling someone to be quiet","Crying at the film","Falling asleep","Getting scared","Laughing"]],
+  ["🦇","Fictional characters",["Harry Potter","Batman","Darth Vader","Sherlock Holmes","Dracula","Spider-Man"]],
+  ["🦸","Superheroes",["Superman","Hulk","The Flash","Thor","Captain America","Iron Man"]],
+  ["⚡","Superpowers",["Flying","Invisibility","Reading minds","Super strength","Telekinesis","X-ray vision"]],
+  ["🦹","Villains",["The Joker","Voldemort","Cruella de Vil","Captain Hook","The Wicked Witch","Thanos"]],
+  ["📖","Fairy tales",["Little Red Riding Hood","Snow White","Pinocchio","The Three Little Pigs","Cinderella","Peter Pan"]],
+  ["🧚","More fairy tales",["Puss in Boots","Alice in Wonderland","Aladdin","Rapunzel","Hansel and Gretel","Sleeping Beauty"]],
+  ["🐉","Fantasy creatures",["Dragon","Unicorn","Mermaid","Zombie","Vampire","Ghost"]],
+  ["🧛","Classic monsters",["Frankenstein","Mummy","Werewolf","Invisible Man","Loch Ness Monster","King Kong"]],
+  ["🤖","Science fiction",["Robot","Teleporting","Time travel","Clone","Cyborg","Laser beam"]],
+
+  // --- Things that... ---
+  ["📢","Noisy things",["Car horn","Alarm","Vacuum cleaner","Drill","Hairdryer","Alarm clock"]],
+  ["🪁","Things that fly",["Plane","Kite","Paper plane","Mosquito","Superhero","Hot-air balloon"]],
+  ["🍯","Sticky things",["Chewing gum","Honey","Toffee","Sticky tape","Glue","Snot"]],
+  ["💔","Things that break",["Glass","Phone","Eggs","Balloon","Heart","Mirror"]],
+  ["🦨","Smelly things",["Dirty sock","Rubbish","Fart","Fish","Old trainer","Rotten egg"]],
+  ["👻","Scary things",["Ghost","Clown","Spider","Cockroach","Horror film","The dark"]],
+
+  // --- Just for laughs ---
+  ["😬","Awkward moments",["Waving back at someone who was waving at someone else","A hug that never ends","Dodging someone on the pavement in the same direction","Getting caught talking to yourself","Saying goodbye and walking the same way","Running out of things to say"]],
+  ["🫣","Embarrassing moments",["Toilet paper stuck to your shoe","Your flies are undone","A silent fart","Singing loudly with headphones on","Splitting your trousers when you bend down","Stepping in dog poo"]],
+  ["🎞️","Movie scenes",["Kiss in the rain","Saying goodbye from a train","Screaming in the shower","Running to your love on the beach","A very dramatic death","Chase across the rooftops"]],
+  ["🐢","In slow motion",["Getting hit in the face by a ball","Sneezing","Winning a race at the finish line","Pillow fight","Jumping into the pool","Falling face first into a cake"]],
+  ["🎶","Songs with a dance",["Thriller","Chicken Dance","YMCA","The Ketchup Song","Gangnam Style","Saturday Night Fever"]],
+  ["🎟️","At a concert",["Moshing","Lighter in the air","Sitting on someone's shoulders","Stuck behind a very tall person","Filming everything on your phone","Losing your friends"]],
+  ["🐈","Cat things",["Knocking things off the table","Getting into a box","Coughing up a hairball","Getting scared by a cucumber","Kneading with its paws","Always landing on its feet"]],
+  ["🐕‍🦺","Dog things",["Chasing its tail","Sticking its head out of the car window","Barking at the postman","Scratching with its back leg","Hiding to avoid the vet","Greeting its owner as if it's been years"]],
+  ["🎤","Singers with style",["Shakira","Lady Gaga","Freddie Mercury","Michael Jackson","Beyoncé","Elvis Presley"]],
+  ["🧑‍🔧","Weird jobs",["Mattress tester","Walking ten dogs at once","Wine taster","Skyscraper window cleaner","Flea trainer","Tokyo subway pusher"]],
+  ["🐣","Getting out of...",["A chick hatching from an egg","A butterfly leaving its cocoon","A sleeping bag","A very small car","The pool without a ladder","A birthday cake"]],
+  ["🤢","Yuck!",["Sour milk","Coffee with salt","Orange juice after brushing your teeth","Finding a hair in your soup","Eating dog food by mistake","Biting a chilli pepper"]],
+  ["🪞","Showing off online",["Duck-face photo","Selfie from above","Holding up the Tower of Pisa","Doing yoga for Instagram","Photographing your food before eating","Pretending you don't know you're being photographed"]],
+  ["🦕","T-Rex arms",["Making the bed","Clapping","Combing your hair","Doing push-ups","Tying your shoelaces","Giving a hug"]],
+  ["😣","Holding it in",["Needing the toilet in a traffic jam","Holding in a sneeze","Trying not to laugh somewhere serious","An itch you can't reach","Pins and needles in your leg","Carrying a bowl of soup that's too full"]],
+  ["🚶","Ways of walking",["Barefoot on stones","On burning hot sand","With aching muscles","Tiptoeing in secret","On a catwalk","In wet flip-flops"]]
+];
+
+/* =========================================================
    CONFIGURACIÓN
    ========================================================= */
 const DURATION = 30; // segundos por ronda
 const PALETTE = ['#ff5d73','#ffc145','#3ddc97','#4cc9f0','#b388ff','#ff8a3d','#f472b6','#a3e635'];
 
-const DECK = RAW.map(([emoji, title, words], i) => ({
+// Mazo del idioma elegido (español o inglés). Cada idioma guarda sus cartas jugadas.
+const buildDeck = () => (G.lang === 'en' ? RAW_EN : RAW).map(([emoji, title, words], i) => ({
   id: i, emoji, title, words, color: PALETTE[i % PALETTE.length]
 }));
+let DECK = buildDeck();
+
+/* =========================================================
+   TEXTOS (español / inglés)
+   ========================================================= */
+G.T.es = {
+  home: '← Juegos', round: 'Ronda {n}', shuffle: '🔀 Ver otras 4 cartas',
+  tag: 'Elige una carta, reparte un <b>número del 1 al 6</b> a cada jugador<br>y… ¡mímica durante <b>30 segundos</b>!',
+  deckInfo: '{total} cartas en el mazo · {left} sin jugar hoy', back: '← Cartas',
+  start: '▶  Empezar', pause: '⏸  Pausa', resume: '▶  Seguir', again: '↺  Repetir', next: 'Siguiente ronda  →',
+  seconds: 'segundos', paused: 'en pausa', timeUp: '¡Tiempo!', ringTitle: 'Toca para empezar o pausar',
+  sound: 'Sonido', otherLang: 'English', selectScreen: 'Elegir carta', playScreen: 'Ronda en juego',
+};
+G.T.en = {
+  home: '← Games', round: 'Round {n}', shuffle: '🔀 Show 4 other cards',
+  tag: 'Pick a card, give each player a <b>number from 1 to 6</b><br>and… act it out for <b>30 seconds</b>!',
+  deckInfo: '{total} cards in the deck · {left} not played today', back: '← Cards',
+  start: '▶  Start', pause: '⏸  Pause', resume: '▶  Resume', again: '↺  Again', next: 'Next round  →',
+  seconds: 'seconds', paused: 'paused', timeUp: "Time's up!", ringTitle: 'Tap to start or pause',
+  sound: 'Sound', otherLang: 'Español', selectScreen: 'Choose a card', playScreen: 'Round in progress',
+};
+function applyTexts() {
+  G.translate();
+  document.querySelector('.tag').innerHTML = G.t('tag');
+  $('#ring').title = G.t('ringTitle');
+}
 
 const $ = (s) => document.querySelector(s);
 const screens = { select: $('#screen-select'), play: $('#screen-play') };
@@ -558,16 +810,16 @@ let round = 1;
 /* Cartas ya jugadas hoy. Solo cuenta como jugada la carta elegida cuando se
    pone en marcha el tiempo; las que salen y no se eligen pueden volver a salir.
    Se recuerda aunque se cierre la app y se vacía cada día a las 5:00. */
-const USED_KEY = 'deck:gestrudis';
+const usedKey = () => (G.lang === 'en' ? 'deck:gestrudis-en' : 'deck:gestrudis');
 let usedDay = G.gameDay();
 let used = loadUsed();
 
 function loadUsed() {
-  const s = G.store.get(USED_KEY, null);
+  const s = G.store.get(usedKey(), null);
   const ok = s && s.day === usedDay && Array.isArray(s.used);
   return new Set(ok ? s.used.filter((id) => id < DECK.length) : []);
 }
-function saveUsed() { G.store.set(USED_KEY, { day: usedDay, used: [...used] }); }
+function saveUsed() { G.store.set(usedKey(), { day: usedDay, used: [...used] }); }
 function checkDay() {
   if (usedDay !== G.gameDay()) { usedDay = G.gameDay(); used.clear(); saveUsed(); }
 }
@@ -656,9 +908,9 @@ function renderSelection() {
     grid.appendChild(b);
   });
 
-  $('#round-pill').textContent = `Ronda ${round}`;
+  $('#round-pill').textContent = G.t('round', { n: round });
   const left = DECK.length - used.size;
-  $('#deck-info').textContent = `${DECK.length} cartas en el mazo · ${left} sin jugar hoy`;
+  $('#deck-info').textContent = G.t('deckInfo', { total: DECK.length, left });
 }
 
 function goToSelection(newCards) {
@@ -678,7 +930,7 @@ function selectCard(card) {
   $('#big-emoji').textContent = card.emoji;
   $('#big-title').textContent = card.title;
   fillList($('#big-list'), card.words);
-  $('#round-label').textContent = `Ronda ${round}`;
+  $('#round-label').textContent = G.t('round', { n: round });
   resetTimer();
   show('play');
   requestWakeLock();
@@ -712,11 +964,10 @@ function drawTimer() {
   ring.classList.toggle('warn', active && sec <= 10 && sec > 5);
   ring.classList.toggle('danger', active && sec <= 5);
   ring.classList.toggle('done', tState === 'done');
-  $('#timer').textContent = tState === 'done' ? '¡Tiempo!' : sec;
+  $('#timer').textContent = tState === 'done' ? G.t('timeUp') : sec;
   $('#timer-sub').textContent =
-    tState === 'paused' ? 'en pausa' :
-    tState === 'idle'   ? 'segundos' :
-    tState === 'done'   ? '' : 'segundos';
+    tState === 'paused' ? G.t('paused') :
+    tState === 'done'   ? '' : G.t('seconds');
 }
 
 function tick() {
@@ -789,16 +1040,16 @@ function renderControls() {
     c.appendChild(b);
   };
   if (tState === 'idle') {
-    add('▶  Empezar', 'primary', startTimer);
+    add(G.t('start'), 'primary', startTimer);
   } else if (tState === 'running') {
-    add('⏸  Pausa', 'grow', pauseTimer);
+    add(G.t('pause'), 'grow', pauseTimer);
     add('↺', '', () => resetTimer());
   } else if (tState === 'paused') {
-    add('▶  Seguir', 'primary grow', startTimer);
+    add(G.t('resume'), 'primary grow', startTimer);
     add('↺', '', () => resetTimer());
   } else {
-    add('↺  Repetir', '', () => resetTimer());
-    add('Siguiente ronda  →', 'next grow', nextRound);
+    add(G.t('again'), '', () => resetTimer());
+    add(G.t('next'), 'next grow', nextRound);
   }
   $('#btn-back').style.visibility = tState === 'running' ? 'hidden' : 'visible';
 }
@@ -885,6 +1136,19 @@ document.addEventListener('visibilitychange', () => {
 $('#btn-shuffle').addEventListener('click', () => goToSelection(true));
 $('#btn-back').addEventListener('click', () => goToSelection(false));
 
+/* Cambiar de idioma: otro mazo y otras cartas en la mesa */
+$('#btn-lang').addEventListener('click', () => {
+  G.setLang(G.lang === 'en' ? 'es' : 'en');
+  applyTexts();
+  DECK = buildDeck();
+  usedDay = G.gameDay();
+  used = loadUsed();
+  currentFour = [];
+  current = null;
+  goToSelection(true);
+});
+
+applyTexts();
 renderSoundBtn();
 goToSelection(true);
 </script>
