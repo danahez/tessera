@@ -1,81 +1,73 @@
-# Juegos con amigos
+# Tessera 🎲
 
-Juegos de fiesta para jugar en grupo con un solo móvil. Es una web que se
-instala como app (PWA) y funciona sin conexión una vez abierta.
+**Juegos de fiesta para jugar con amigos con un solo móvil.**
 
-| Juego | Archivo |
-|---|---|
-| 🎭 Gestrudis | `juegos/gestrudis.html` |
-| 🚫 Tabú | `juegos/tabu.html` |
-| 🔊 Sound Charades | `juegos/sound-charades.html` |
-| ☝️ Just One | `juegos/just-one.html` |
-| ⚖️ Dios en el Bar (debates) | `juegos/debates.html` |
+👉 **Jugar ahora: <https://danahez.github.io/tessera/>**
 
-## Estructura
+En la antigua Roma, la *tessera* era la ficha o el dado con el que se jugaba en las reuniones.
+Esta es la versión de bolsillo: una colección de juegos para quedar, pasarse el móvil y reírse un rato.
+No hace falta que cada uno instale nada, ni crear cuentas, ni tener conexión una vez abierta.
+
+---
+
+## Los juegos
+
+### 🎭 Gestrudis
+Mímica por números. Quien presenta elige una carta entre cuatro. Cada carta tiene un tema y seis opciones numeradas del 1 al 6.
+Reparte cartas físicas del 1 al 6 a los demás y lee en voz alta qué es cada número. Después empiezan **30 segundos**:
+cada jugador hace su mímica (sin hablar, pero con sonidos) mientras quien presenta reparte otras cartas boca abajo intentando adivinar quién es cada número.
+Al acabar el tiempo se comprueba si ha acertado todos. No hay puntos: es para reírse.
+
+*Necesitáis dos juegos de cartas o papelitos con los números del 1 al 6: uno para repartir y otro para adivinar.*
+
+### 🚫 Tabú
+Describe la palabra sin decir ninguna de las cuatro prohibidas. Tu grupo tiene que adivinarla antes de que se acabe el tiempo.
+**Acierto +1 · Tabú −1 · Pasar 0.**
+
+### 🔊 Sound Charades
+Haz lo que pone en la pantalla **solo con sonidos**: sin hablar y sin usar los brazos.
+De una olla exprés a Chewbacca o un ganso enfadado. Los demás adivinan.
+
+### ☝️ Just One
+Sale una palabra secreta. Quien adivina no la ve: el móvil se enseña a los demás.
+Cada uno escribe **una sola palabra** de pista, las pistas repetidas se eliminan y quien adivina solo ve las que quedan.
+Acierte o falle, se pasa a la siguiente y el móvil va rotando.
+
+### ⚖️ Dios en el Bar
+Sale un debate polémico y la app decide al azar qué lado de la mesa defiende cada postura.
+Quien sujeta el móvil escucha a los dos bandos y decide quién gana.
+
+---
+
+## Cómo se juega
+
+- **Un solo móvil.** Se pasa de mano en mano o lo sujeta quien presenta.
+- **Con o sin puntos.** En Tabú y Sound Charades podéis jugar en un solo grupo o en dos equipos,
+  con los puntos de cada turno o con un marcador hasta el número de rondas que elijáis.
+- **Sin pasar a lo loco.** En Tabú, Sound Charades y Just One, el botón de pasar se bloquea unos segundos
+  con cada palabra nueva (se puede cambiar en el menú).
+- **Sin repeticiones.** Durante el mismo día no se repite ninguna carta. A partir de las 5:00 de la mañana se vuelve a barajar todo.
+- **La pantalla no se apaga** mientras jugáis, y suena un aviso cuando se acaba el tiempo (se puede silenciar).
+
+## Instalarla en el móvil
+
+1. Abre <https://danahez.github.io/tessera/> en **Chrome** (Android) o **Safari** (iPhone).
+2. Android: menú ⋮ → **Instalar aplicación** o **Añadir a pantalla de inicio**.
+   iPhone: botón de compartir → **Añadir a pantalla de inicio**.
+3. Aparecerá como una app más. Ábrela una vez con conexión y después funcionará también sin internet.
+
+---
+
+## Por dentro
+
+Es una web estática hecha con HTML, CSS y JavaScript, sin frameworks ni servidor.
+No guarda nada fuera de tu móvil: los ajustes y las cartas que han salido se quedan en el propio navegador.
 
 ```
-index.html             Menú principal con todos los juegos
-manifest.webmanifest   Nombre, icono y colores de la app instalada
-sw.js                  Service worker: guarda copia para jugar sin conexión
-.nojekyll              Indica a GitHub Pages que publique los archivos tal cual
-icons/                 Iconos de la app
-shared/common.js       Utilidades comunes (mazo sin repeticiones, temporizador,
-                       sonido, pantalla encendida, espera para pasar)
-shared/turns.js        Motor de turnos/equipos/marcador (Tabú y Sound Charades)
-shared/estilo.css      Diseño común de Tabú, Sound Charades y Just One
-juegos/                Un archivo HTML por juego
-Claude/                Contexto del proyecto para trabajar con IA
-_originales/           Copia de las versiones antiguas (NO se sube)
+index.html        Menú principal
+juegos/           Un archivo por juego, con sus cartas dentro
+shared/           Código y estilos comunes (mazo, temporizador, diseño)
+sw.js             Permite jugar sin conexión
 ```
 
-## Publicar en GitHub Pages (desde la web, sin comandos)
-
-### 1. Crear el repositorio
-1. Entra en <https://github.com> → botón **New** (o **+** → *New repository*).
-2. Nombre, por ejemplo `juegos`. Márcalo como **Public**
-   (con el plan gratuito, Pages solo funciona en repositorios públicos).
-3. **Create repository**.
-
-### 2. Subir los archivos
-1. En el repositorio vacío, pulsa **uploading an existing file**
-   (o **Add file → Upload files**).
-2. Desde el explorador de archivos del ordenador, **arrastra a la página**
-   estos elementos (las carpetas se suben con su contenido y respetan la estructura):
-   - `index.html`, `manifest.webmanifest`, `sw.js`, `README.md`, `.nojekyll`
-   - carpetas `icons`, `shared`, `juegos` y `Claude`
-3. **No subas** la carpeta `_originales`.
-4. Abajo, pulsa **Commit changes**.
-
-> `.nojekyll` es un archivo oculto: si no lo ves, activa "mostrar archivos
-> ocultos" (Ctrl+H en Linux). No es imprescindible, pero conviene subirlo.
-
-### 3. Activar la web
-1. En el repositorio: **Settings → Pages**.
-2. En *Build and deployment*: **Source: Deploy from a branch**,
-   rama **main**, carpeta **/ (root)** → **Save**.
-3. En un par de minutos estará en `https://TU_USUARIO.github.io/juegos/`
-   (la dirección aparece arriba en esa misma página).
-
-## Instalar en el móvil (Android)
-
-Abre la dirección en **Chrome** (no desde el navegador interno de Telegram) →
-pulsa **📲 Instalar como app** en el menú, o ⋮ → *Instalar aplicación* /
-*Añadir a pantalla de inicio*. Aparecerá el icono como una app más.
-
-## Actualizar o añadir juegos
-
-- **Cambiar un archivo**: en GitHub, entra en el archivo → icono del lápiz ✏️ →
-  edita → **Commit changes**. O bien **Add file → Upload files** y sube la nueva
-  versión con el mismo nombre dentro de la misma carpeta (la sustituye).
-- Con conexión, la app siempre carga la última versión publicada
-  (a veces hay que cerrarla y abrirla de nuevo, o esperar un par de minutos).
-- **Juego nuevo**:
-  1. Sube `mi-juego.html` dentro de la carpeta `juegos`.
-  2. En `index.html`, copia uno de los bloques `<a class="game">` y cambia enlace y texto.
-  3. En `sw.js`, añade `'juegos/mi-juego.html',` a la lista `PRECACHE`
-     y sube un número la versión de `CACHE` (`juegos-v2` → `juegos-v3`) para que funcione sin conexión.
-
-## Probar en el ordenador (opcional)
-
-Abrir los HTML con doble clic funciona para echar un vistazo, aunque el modo
-sin conexión y la instalación como app solo funcionan desde la web publicada.
+¿Ideas para cartas nuevas o para algún juego más? Se aceptan sugerencias.
